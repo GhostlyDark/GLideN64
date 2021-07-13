@@ -29,7 +29,7 @@ void Config::resetToDefaults()
 #if defined(OS_MAC_OS_X)
 	video.threadedVideo = 0;
 #else
-	video.threadedVideo = 1;
+	video.threadedVideo = 0;
 #endif
 
 	texture.maxAnisotropy = 0;
@@ -93,8 +93,8 @@ void Config::resetToDefaults()
 	textureFilter.txCacheCompression = 1;
 	textureFilter.txSaveCache = 1;
 
-	textureFilter.txEnhancedTextureFileStorage = 0;
-	textureFilter.txHiresTextureFileStorage = 0;
+	textureFilter.txEnhancedTextureFileStorage = 1;
+	textureFilter.txHiresTextureFileStorage = 1;
 
 	api().GetUserDataPath(textureFilter.txPath);
 	gln_wcscat(textureFilter.txPath, wst("/hires_texture"));
