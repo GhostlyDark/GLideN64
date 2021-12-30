@@ -4,7 +4,7 @@
 #include "TxFilterExport.h"
 #include <osal_files.h>
 
-#define MAX_TEX_MEMORY 1073741824 /* 1 GiB */
+#define MAX_TEX_MEMORY 2147483648 /* 2 GiB */
 
 TxHiResNoCache::TxHiResNoCache(int maxwidth,
 			   int maxheight,
