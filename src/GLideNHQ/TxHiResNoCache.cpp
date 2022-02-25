@@ -49,44 +49,30 @@ bool TxHiResNoCache::empty() const
 	return _filesIndex.empty();
 }
 
-TxHiResNoCache::FileIndexMap::const_iterator TxHiResNoCache::findFile(Checksum checksum, N64FormatSize n64FmtSz) const
+bool TxHiResNoCache::get(Checksum checksum, GHQTexInfo *info)
 {
-	auto range = _filesIndex.equal_range(checksum);
-	for (auto it = range.first; it != range.second; ++it) {
-		if (N64FormatSize(it->second.fmt, it->second.siz).formatsize() == n64FmtSz.formatsize())
-			return it;
-	}
-	return _filesIndex.end();
-}
-
-bool TxHiResNoCache::get(Checksum checksum, N64FormatSize n64FmtSz, GHQTexInfo *info)
-{
-	if (!checksum)
+	if (!checksum) {
 		return false;
+	}
 
-	uint32 chksum = checksum._texture;
-	uint32 palchksum = checksum._palette;
+
+#ifdef DEBUG
+	uint32 chksum = checksum._checksum & 0xffffffff;
+	uint32 palchksum = checksum._checksum >> 32;
+#endif
 
 	/* loop over each file from the index and try to match it with checksum */
-	auto indexEntry = findFile(checksum, n64FmtSz);
-	if (indexEntry == _filesIndex.cend()) {
+	auto indexEntry = _filesIndex.find(checksum);
+	if (indexEntry == _filesIndex.end()) {
 		DBG_INFO(80, wst("TxNoCache::get: chksum:%08X %08X not found\n"), chksum, palchksum);
 		return false;
 	}
 
-	auto entry = indexEntry->second;
+	fileIndexEntry_t& entry = indexEntry->second;
 
 	/* make sure to not load the same texture twice */
-	auto findTex = [n64FmtSz, this](Checksum checksum)
-	{
-		auto range = _loadedTex.equal_range(checksum);
-		for (auto it = range.first; it != range.second; ++it) {
-			if (it->second.n64_format_size == n64FmtSz)
-				return it;
-		}
-		return _loadedTex.end();
-	};
-	if (auto loadedTexMap = findTex(checksum); loadedTexMap != _loadedTex.end()) {
+	auto loadedTexMap = _loadedTex.find(checksum);
+	if (loadedTexMap != _loadedTex.end()) {
 		DBG_INFO(80, wst("TxNoCache::get: cached chksum:%08X %08X found\n"), chksum, palchksum);
 		*info = loadedTexMap->second;
 		return true;
@@ -127,7 +113,6 @@ bool TxHiResNoCache::get(Checksum checksum, N64FormatSize n64FmtSz, GHQTexInfo *
 	info->width = width;
 	info->height = height;
 	info->is_hires_tex = 1;
-	info->n64_format_size = n64FmtSz;
 	setTextureFormat(format, info);
 
 	/* add to loaded textures */
@@ -195,8 +180,9 @@ bool TxHiResNoCache::_createFileIndexInDir(tx_wstring directory, bool update)
 
 		uint64 chksum64 = 0;
 		uint32 chksum = 0, palchksum = 0, length = 0;
-		FileIndexEntry entry;
+		fileIndexEntry_t entry;
 		entry.fmt = entry.siz = 0;
+		bool ret = false;
 
 		wcstombs(entry.fname, foundfilename, MAX_PATH);
 
@@ -219,14 +205,14 @@ bool TxHiResNoCache::_createFileIndexInDir(tx_wstring directory, bool update)
 		}
 
 		/* try to add entry to file index */
-		if (findFile(chksum64, N64FormatSize(entry.fmt, entry.siz)) != _filesIndex.cend()) {
+		ret = _filesIndex.insert(std::map<uint64, fileIndexEntry_t>::value_type(chksum64, entry)).second;
+		if (!ret) {
 			/* technically we should probably fail here,
 			 * however HTS & HTC both don't fail when there are duplicates,
 			 * so to maintain backwards compatability, we won't either
 			 */
 			DBG_INFO(80, wst("TxNoCache::_createFileIndexInDir: failed to add cksum:%08X %08X file:%ls\n"), chksum, palchksum, texturefilename.c_str());
 		} else {
-			_filesIndex.insert(std::map<uint64, FileIndexEntry>::value_type(chksum64, entry));
 			DBG_INFO(80, wst("TxNoCache::_createFileIndexInDir: added cksum:%08X %08X file:%ls\n"), chksum, palchksum, texturefilename.c_str());
 		}
 
