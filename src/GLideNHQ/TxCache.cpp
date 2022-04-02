@@ -37,19 +37,17 @@
 #include "TxCache.h"
 #include "TxDbg.h"
 
-#define TXCACHE_FORMAT_VERSION UNDEFINED_1
-
 class TxCacheImpl
 {
 public:
 	virtual ~TxCacheImpl() = default;
 
 	virtual bool add(Checksum checksum, GHQTexInfo *info, int dataSize = 0) = 0;
-	virtual bool get(Checksum checksum, N64FormatSize n64FmtSz, GHQTexInfo *info) = 0;
+	virtual bool get(Checksum checksum, GHQTexInfo *info) = 0;
 	virtual bool save(const wchar_t *path, const wchar_t *filename, const int config) = 0;
 	virtual bool load(const wchar_t *path, const wchar_t *filename, const int config, bool force) = 0;
 	virtual bool del(Checksum checksum) = 0;
-	virtual bool isCached(Checksum checksum, N64FormatSize n64FmtSz) const = 0;
+	virtual bool isCached(Checksum checksum) = 0;
 	virtual void clear() = 0;
 	virtual bool empty() const = 0;
 	virtual uint32 getOptions() const = 0;
@@ -70,12 +68,12 @@ public:
 	~TxMemoryCache();
 
 	bool add(Checksum checksum, GHQTexInfo *info, int dataSize = 0) override;
-	bool get(Checksum checksum, N64FormatSize n64FmtSz, GHQTexInfo *info) override;
+	bool get(Checksum checksum, GHQTexInfo *info) override;
 
 	bool save(const wchar_t *path, const wchar_t *filename, const int config) override;
 	bool load(const wchar_t *path, const wchar_t *filename, const int config, bool force) override;
 	bool del(Checksum checksum) override;
-	bool isCached(Checksum checksum, N64FormatSize n64FmtSz) const override;
+	bool isCached(Checksum checksum) override;
 	void clear() override;
 	bool empty() const  override { return _cache.empty(); }
 
@@ -97,15 +95,12 @@ private:
 	uint64 _cacheLimit;
 	uint64 _totalSize;
 
-	using Cache = std::multimap<uint64, TXCACHE*>;
-	Cache _cache;
-	Cache::const_iterator find(Checksum checksum, N64FormatSize n64FmtSz) const;
+	std::map<uint64, TXCACHE*> _cache;
 	std::list<uint64> _cachelist;
 
 	uint8 *_gzdest0 = nullptr;
 	uint8 *_gzdest1 = nullptr;
 	uint32 _gzdestLen = 0;
-	bool _isOldVersion = false;
 };
 
 TxMemoryCache::TxMemoryCache(uint32 options,
@@ -138,11 +133,11 @@ TxMemoryCache::~TxMemoryCache()
 	clear();
 }
 
-bool TxMemoryCache::add(Checksum checksum, GHQTexInfo* info, int dataSize)
+bool TxMemoryCache::add(Checksum checksum, GHQTexInfo *info, int dataSize)
 {
 	/* NOTE: dataSize must be provided if info->data is zlib compressed. */
 
-	if (!checksum || !info->data || find(checksum, info->n64_format_size) != _cache.end())
+	if (!checksum || !info->data || _cache.find(checksum) != _cache.end())
 		return false;
 
 	uint8 *dest = info->data;
@@ -211,7 +206,7 @@ bool TxMemoryCache::add(Checksum checksum, GHQTexInfo* info, int dataSize)
 	memcpy(tmpdata, dest, dataSize);
 
 	/* copy it */
-	txCache->info = *info;
+	memcpy(&txCache->info, info, sizeof(GHQTexInfo));
 	txCache->info.data = tmpdata;
 	txCache->info.format = format;
 	txCache->size = dataSize;
@@ -226,7 +221,7 @@ bool TxMemoryCache::add(Checksum checksum, GHQTexInfo* info, int dataSize)
 
 #ifdef DEBUG
 	DBG_INFO(80, wst("[%5d] added!! crc:%08X %08X %d x %d gfmt:%x total:%.02fmb\n"),
-		_cache.size(), checksum._palette, checksum._texture,
+		_cache.size(), checksum._hi, checksum._low,
 		info->width, info->height, info->format & 0xffff, (double)_totalSize / 1000000);
 
 	if (_cacheLimit != 0) {
@@ -244,53 +239,41 @@ bool TxMemoryCache::add(Checksum checksum, GHQTexInfo* info, int dataSize)
 	return true;
 }
 
-TxMemoryCache::Cache::const_iterator TxMemoryCache::find(Checksum checksum, N64FormatSize n64FmtSz) const
-{
-	if (_isOldVersion)
-		return _cache.find(checksum);
-
-	auto range = _cache.equal_range(checksum);
-	for (auto it = range.first; it != range.second; ++it) {
-		if (it->second->info.n64_format_size.formatsize() == n64FmtSz.formatsize())
-			return it;
-	}
-	return _cache.cend();
-}
-
-bool TxMemoryCache::get(Checksum checksum, N64FormatSize n64FmtSz, GHQTexInfo *info)
+bool TxMemoryCache::get(Checksum checksum, GHQTexInfo *info)
 {
 	if (!checksum || _cache.empty())
 		return false;
 
 	/* find a match in cache */
-	auto itMap = find(checksum, n64FmtSz);
-	if (itMap == _cache.end())
-		return false;
+	auto itMap = _cache.find(checksum);
+	if (itMap != _cache.end()) {
+		/* yep, we've got it. */
+		memcpy(info, &(((*itMap).second)->info), sizeof(GHQTexInfo));
 
-	/* yep, we've got it. */
-	*info = ((*itMap).second)->info;
-
-	/* push it to the back of the list */
-	if (_cacheLimit != 0) {
-		_cachelist.erase(((*itMap).second)->it);
-		_cachelist.push_back(checksum);
-		((*itMap).second)->it = --(_cachelist.end());
-	}
-
-	/* zlib decompress it */
-	if (info->format & GL_TEXFMT_GZ) {
-		uLongf destLen = _gzdestLen;
-		uint8 *dest = (_gzdest0 == info->data) ? _gzdest1 : _gzdest0;
-		if (uncompress(dest, &destLen, info->data, ((*itMap).second)->size) != Z_OK) {
-			DBG_INFO(80, wst("Error: zlib decompression failed!\n"));
-			return false;
+		/* push it to the back of the list */
+		if (_cacheLimit != 0) {
+			_cachelist.erase(((*itMap).second)->it);
+			_cachelist.push_back(checksum);
+			((*itMap).second)->it = --(_cachelist.end());
 		}
-		info->data = dest;
-		info->format &= ~GL_TEXFMT_GZ;
-		DBG_INFO(80, wst("zlib decompressed: %.02fkb->%.02fkb\n"), (float)(((*itMap).second)->size) / 1000, (float)destLen / 1000);
+
+		/* zlib decompress it */
+		if (info->format & GL_TEXFMT_GZ) {
+			uLongf destLen = _gzdestLen;
+			uint8 *dest = (_gzdest0 == info->data) ? _gzdest1 : _gzdest0;
+			if (uncompress(dest, &destLen, info->data, ((*itMap).second)->size) != Z_OK) {
+				DBG_INFO(80, wst("Error: zlib decompression failed!\n"));
+				return false;
+			}
+			info->data = dest;
+			info->format &= ~GL_TEXFMT_GZ;
+			DBG_INFO(80, wst("zlib decompressed: %.02fkb->%.02fkb\n"), (float)(((*itMap).second)->size) / 1000, (float)destLen / 1000);
+		}
+
+		return true;
 	}
 
-	return true;
+	return false;
 }
 
 bool TxMemoryCache::save(const wchar_t *path, const wchar_t *filename, int config)
@@ -319,10 +302,6 @@ bool TxMemoryCache::save(const wchar_t *path, const wchar_t *filename, int confi
 	gzFile gzfp = gzopen(cbuf, "wb1");
 	DBG_INFO(80, wst("gzfp:%x file:%ls\n"), gzfp, filename);
 	if (gzfp) {
-		/* write current version */
-		int version = TXCACHE_FORMAT_VERSION;
-		gzwrite(gzfp, &version, 4);
-
 		/* write header to determine config match */
 		gzwrite(gzfp, &config, 4);
 
@@ -361,7 +340,6 @@ bool TxMemoryCache::save(const wchar_t *path, const wchar_t *filename, int confi
 				gzwrite(gzfp, &((*itMap).second->info.texture_format), 2);
 				gzwrite(gzfp, &((*itMap).second->info.pixel_type), 2);
 				gzwrite(gzfp, &((*itMap).second->info.is_hires_tex), 1);
-				gzwrite(gzfp, &((*itMap).second->info.n64_format_size._formatsize), 2);
 
 				gzwrite(gzfp, &destLen, 4);
 				gzwrite(gzfp, dest, destLen);
@@ -404,19 +382,9 @@ bool TxMemoryCache::load(const wchar_t *path, const wchar_t *filename, int confi
 		/* yep, we have it. load it into memory cache. */
 		int dataSize;
 		uint64 checksum;
-
-		int version = 0;
-		int tmpconfig = 0;
-		/* read version */
-		gzread(gzfp, &version, 4);
-		if (version == TXCACHE_FORMAT_VERSION) {
-			_isOldVersion = false;
-			/* read header to determine config match */
-			gzread(gzfp, &tmpconfig, 4);
-		} else {
-			_isOldVersion = true;
-			tmpconfig = version;
-		}
+		int tmpconfig;
+		/* read header to determine config match */
+		gzread(gzfp, &tmpconfig, 4);
 
 		if (tmpconfig == config || force) {
 			do {
@@ -430,8 +398,6 @@ bool TxMemoryCache::load(const wchar_t *path, const wchar_t *filename, int confi
 				gzread(gzfp, &tmpInfo.texture_format, 2);
 				gzread(gzfp, &tmpInfo.pixel_type, 2);
 				gzread(gzfp, &tmpInfo.is_hires_tex, 1);
-				if (!_isOldVersion)
-					gzread(gzfp, &tmpInfo.n64_format_size._formatsize, 2);
 
 				gzread(gzfp, &dataSize, 4);
 
@@ -479,7 +445,7 @@ bool TxMemoryCache::del(Checksum checksum)
 		delete (*itMap).second;
 		_cache.erase(itMap);
 
-		DBG_INFO(80, wst("removed from cache: checksum = %08X %08X\n"), checksum._palette, checksum._texture);
+		DBG_INFO(80, wst("removed from cache: checksum = %08X %08X\n"), checksum._low, checksum._hi);
 
 		return true;
 	}
@@ -487,9 +453,9 @@ bool TxMemoryCache::del(Checksum checksum)
 	return false;
 }
 
-bool TxMemoryCache::isCached(Checksum checksum, N64FormatSize n64FmtSz) const
+bool TxMemoryCache::isCached(Checksum checksum)
 {
-	return find(checksum, n64FmtSz) != _cache.cend();
+	return _cache.find(checksum) != _cache.end();
 }
 
 void TxMemoryCache::clear()
@@ -519,12 +485,12 @@ public:
 	~TxFileStorage() = default;
 
 	bool add(Checksum checksum, GHQTexInfo *info, int dataSize = 0) override;
-	bool get(Checksum checksum, N64FormatSize n64FmtSz, GHQTexInfo *info) override;
+	bool get(Checksum checksum, GHQTexInfo *info) override;
 
 	bool save(const wchar_t *path, const wchar_t *filename, const int config) override;
 	bool load(const wchar_t *path, const wchar_t *filename, const int config, bool force) override;
 	bool del(Checksum checksum) override { return false; }
-	bool isCached(Checksum checksum, N64FormatSize n64FmtSz) const override;
+	bool isCached(Checksum checksum) override;
 	void clear() override;
 	bool empty() const override { return _storage.empty(); }
 
@@ -547,19 +513,8 @@ private:
 	dispInfoFuncExt _callback;
 	uint64 _totalSize = 0;
 
-	union StorageOffset
-	{
-		StorageOffset() : _data(0U) {}
-		StorageOffset(int64 data) : _data(data) {}
-		struct {
-			int64 _offset : 48;
-			int64 _formatsize : 16;
-		};
-		int64 _data;
-	};
-	using StorageMap = std::unordered_multimap<uint64, StorageOffset>;
+	using StorageMap = std::unordered_map<uint64, int64>;
 	StorageMap _storage;
-	StorageMap::const_iterator find(Checksum checksum, N64FormatSize n64FmtSz) const;
 
 	uint8 *_gzdest0 = nullptr;
 	uint8 *_gzdest1 = nullptr;
@@ -569,15 +524,12 @@ private:
 	std::ofstream _outfile;
 	int64 _storagePos = 0;
 	bool _dirty = false;
-	bool _isOldVersion = false;
 	static const int _fakeConfig;
 	static const int64 _initialPos;
-	static const int64 _initialPosOld;
 };
 
 const int TxFileStorage::_fakeConfig = -1;
-const int64 TxFileStorage::_initialPos = sizeof(int64) + sizeof(int) + sizeof(int); // offset + version + config
-const int64 TxFileStorage::_initialPosOld = sizeof(int64) + sizeof(int);  // offset + config
+const int64 TxFileStorage::_initialPos = sizeof(int64) + sizeof(int);
 
 TxFileStorage::TxFileStorage(uint32 options,
 	const wchar_t *cachePath,
@@ -642,8 +594,6 @@ bool TxFileStorage::open(bool forRead)
 	if (!_outfile.good())
 		return false;
 
-	const int version = TXCACHE_FORMAT_VERSION;
-	FWRITE(version);
 	FWRITE(_fakeConfig);
 	_storagePos = _initialPos;
 	FWRITE(_storagePos);
@@ -666,8 +616,6 @@ void TxFileStorage::clear()
 		_outfile.close();
 
 	_outfile.open(_fullPath, std::ofstream::out | std::ofstream::binary | std::ofstream::trunc);
-	const int version = TXCACHE_FORMAT_VERSION;
-	FWRITE(version);
 	FWRITE(_fakeConfig);
 	_storagePos = _initialPos;
 	FWRITE(_storagePos);
@@ -684,7 +632,6 @@ bool TxFileStorage::writeData(uint32 dataSize, const GHQTexInfo & info)
 	FWRITE(info.texture_format);
 	FWRITE(info.pixel_type);
 	FWRITE(info.is_hires_tex);
-	FWRITE(info.n64_format_size._formatsize);
 	FWRITE(dataSize);
 	_outfile.write((char*)info.data, dataSize);
 	return _outfile.good();
@@ -698,8 +645,6 @@ bool TxFileStorage::readData(GHQTexInfo & info)
 	FREAD(info.texture_format);
 	FREAD(info.pixel_type);
 	FREAD(info.is_hires_tex);
-	if (!_isOldVersion)
-		FREAD(info.n64_format_size._formatsize);
 
 	uint32 dataSize = 0U;
 	FREAD(dataSize);
@@ -734,7 +679,7 @@ bool TxFileStorage::add(Checksum checksum, GHQTexInfo *info, int dataSize)
 {
 	/* NOTE: dataSize must be provided if info->data is zlib compressed. */
 
-	if (!checksum || !info->data || isCached(checksum, info->n64_format_size))
+	if (!checksum || !info->data || _storage.find(checksum) != _storage.end())
 		return false;
 
 	if (_infile.is_open() || !_outfile.is_open())
@@ -779,12 +724,8 @@ bool TxFileStorage::add(Checksum checksum, GHQTexInfo *info, int dataSize)
 
 	_outfile.seekp(_storagePos, std::ofstream::beg);
 	assert(_storagePos == _outfile.tellp());
-	assert(_storagePos < 0xFFFFFFFFFFFFFF);
 
-	StorageOffset offset;
-	offset._formatsize = info->n64_format_size.formatsize();
-	offset._offset = _storagePos;
-	_storage.insert(StorageMap::value_type(checksum._checksum, offset));
+	_storage.insert(StorageMap::value_type(checksum._checksum, _storagePos));
 	if (!writeData(dataSize, infoToWrite))
 		return false;
 	_storagePos = _outfile.tellp();
@@ -792,7 +733,7 @@ bool TxFileStorage::add(Checksum checksum, GHQTexInfo *info, int dataSize)
 
 #ifdef DEBUG
 	DBG_INFO(80, wst("[%5d] added!! crc:%08X %08X %d x %d gfmt:%x total:%.02fmb\n"),
-		_storage.size(), checksum._palette, checksum._texture,
+		_storage.size(), checksum._hi, checksum._low,
 		info->width, info->height, info->format & 0xffff, (double)(_totalSize / 1024) / 1024.0);
 #endif
 
@@ -802,26 +743,13 @@ bool TxFileStorage::add(Checksum checksum, GHQTexInfo *info, int dataSize)
 	return true;
 }
 
-TxFileStorage::StorageMap::const_iterator TxFileStorage::find(Checksum checksum, N64FormatSize n64FmtSz) const
-{
-	if (_isOldVersion)
-		return _storage.find(checksum);
-
-	auto range = _storage.equal_range(checksum);
-	for (auto it = range.first; it != range.second; ++it) {
-		if (static_cast<uint16>(it->second._formatsize) == n64FmtSz.formatsize())
-			return it;
-	}
-	return _storage.cend();
-}
-
-bool TxFileStorage::get(Checksum checksum, N64FormatSize n64FmtSz, GHQTexInfo *info)
+bool TxFileStorage::get(Checksum checksum, GHQTexInfo *info)
 {
 	if (!checksum || _storage.empty())
 		return false;
 
 	/* find a match in storage */
-	auto itMap = find(checksum, n64FmtSz);
+	auto itMap = _storage.find(checksum);
 	if (itMap == _storage.end())
 		return false;
 
@@ -829,7 +757,7 @@ bool TxFileStorage::get(Checksum checksum, N64FormatSize n64FmtSz, GHQTexInfo *i
 		if (!open(true))
 			return false;
 
-	_infile.seekg(itMap->second._offset, std::ifstream::beg);
+	_infile.seekg(itMap->second, std::ifstream::beg);
 	return readData(*info);
 }
 
@@ -854,8 +782,6 @@ bool TxFileStorage::save(const wchar_t *path, const wchar_t *filename, int confi
 
 	_outfile.seekp(0L, std::ofstream::beg);
 
-	int version = TXCACHE_FORMAT_VERSION;
-	FWRITE(version);
 	FWRITE(config);
 	FWRITE(_storagePos);
 	_outfile.seekp(_storagePos, std::ofstream::beg);
@@ -865,7 +791,7 @@ bool TxFileStorage::save(const wchar_t *path, const wchar_t *filename, int confi
 		(*_callback)(wst("Saving texture storage...\n"));
 	for (auto& item : _storage) {
 		FWRITE(item.first);
-		FWRITE(item.second._data);
+		FWRITE(item.second);
 	}
 	_outfile.close();
 	if (_callback)
@@ -887,38 +813,19 @@ bool TxFileStorage::load(const wchar_t *path, const wchar_t *filename, int confi
 		if (!open(true))
 			return false;
 
-	int version = 0;
 	int tmpconfig = 0;
-	/* read version */
+	/* read header to determine config match */
 	_infile.seekg(0L, std::ifstream::beg);
-	FREAD(version);
-	if (version == TXCACHE_FORMAT_VERSION) {
-		_isOldVersion = false;
-		/* read header to determine config match */
-		FREAD(tmpconfig);
-		FREAD(_storagePos);
-		if (tmpconfig == _fakeConfig) {
-			if (_storagePos != _initialPos)
-				return false;
-		} else if (tmpconfig != config && !force)
+	FREAD(tmpconfig);
+	FREAD(_storagePos);
+	if (tmpconfig == _fakeConfig) {
+		if (_storagePos != _initialPos)
 			return false;
+	} else if (tmpconfig != config && !force)
+		return false;
 
-		if (_storagePos <= _initialPos)
-			return false;
-	} else {
-		_isOldVersion = true;
-		tmpconfig = version;
-		FREAD(_storagePos);
-		if (tmpconfig == _fakeConfig) {
-			if (_storagePos != _initialPosOld)
-				return false;
-		} else if (tmpconfig != config && !force)
-			return false;
-
-		if (_storagePos <= _initialPosOld)
-			return false;
-	}
-
+	if (_storagePos <= sizeof(config) + sizeof(_storagePos))
+		return false;
 	_infile.seekg(_storagePos, std::ifstream::beg);
 
 	int storageSize = 0;
@@ -942,9 +849,9 @@ bool TxFileStorage::load(const wchar_t *path, const wchar_t *filename, int confi
 	return !_storage.empty();
 }
 
-bool TxFileStorage::isCached(Checksum checksum, N64FormatSize n64FmtSz) const
+bool TxFileStorage::isCached(Checksum checksum)
 {
-	return find(checksum, n64FmtSz) != _storage.cend();
+	return _storage.find(checksum) != _storage.end();
 }
 
 /************************** TxCache *************************************/
@@ -979,9 +886,9 @@ bool TxCache::add(Checksum checksum, GHQTexInfo *info, int dataSize)
 	return _pImpl->add(checksum, info, dataSize);
 }
 
-bool TxCache::get(Checksum checksum, N64FormatSize n64FmtSz, GHQTexInfo *info)
+bool TxCache::get(Checksum checksum, GHQTexInfo *info)
 {
-	return _pImpl->get(checksum, n64FmtSz, info);
+	return _pImpl->get(checksum, info);
 }
 
 uint64 TxCache::size() const
@@ -1014,9 +921,9 @@ bool TxCache::del(Checksum checksum)
 	return _pImpl->del(checksum);
 }
 
-bool TxCache::isCached(Checksum checksum, N64FormatSize n64FmtSz) const
+bool TxCache::isCached(Checksum checksum)
 {
-	return _pImpl->isCached(checksum, n64FmtSz);
+	return _pImpl->isCached(checksum);
 }
 
 void TxCache::clear()
