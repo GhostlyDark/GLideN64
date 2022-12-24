@@ -209,8 +209,8 @@ bool DisplayWindowMupen64plus::_resizeWindow()
 	switch (CoreVideo_ResizeWindow(m_screenWidth, m_screenHeight)) {
 		case M64ERR_INVALID_STATE:
 			LOG(LOG_ERROR, "Error setting videomode %dx%d in fullscreen mode", m_screenWidth, m_screenHeight);
-			m_width = m_screenWidth = config.video.windowedWidth;
-			m_height = m_screenHeight = config.video.windowedHeight;
+//			m_width = m_screenWidth = config.video.windowedWidth;
+//			m_height = m_screenHeight = config.video.windowedHeight;
 			break;
 		case M64ERR_SUCCESS:
 			break;
