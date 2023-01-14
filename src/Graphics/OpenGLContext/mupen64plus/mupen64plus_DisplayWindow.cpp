@@ -206,21 +206,21 @@ bool DisplayWindowMupen64plus::_resizeWindow()
 
 	m_width = m_screenWidth = m_resizeWidth;
 	m_height = m_screenHeight = m_resizeHeight;
-	switch (CoreVideo_ResizeWindow(m_screenWidth, m_screenHeight)) {
-		case M64ERR_INVALID_STATE:
-			LOG(LOG_ERROR, "Error setting videomode %dx%d in fullscreen mode", m_screenWidth, m_screenHeight);
-			m_width = m_screenWidth = config.video.windowedWidth;
-			m_height = m_screenHeight = config.video.windowedHeight;
-			break;
-		case M64ERR_SUCCESS:
-			break;
-		default:
-			LOG(LOG_ERROR, "Error setting videomode %dx%d", m_screenWidth, m_screenHeight);
-			m_width = m_screenWidth = config.video.windowedWidth;
-			m_height = m_screenHeight = config.video.windowedHeight;
-			FunctionWrapper::CoreVideo_Quit();
-			return false;
-	}
+//	switch (CoreVideo_ResizeWindow(m_screenWidth, m_screenHeight)) {
+//		case M64ERR_INVALID_STATE:
+//			LOG(LOG_ERROR, "Error setting videomode %dx%d in fullscreen mode", m_screenWidth, m_screenHeight);
+//			m_width = m_screenWidth = config.video.windowedWidth;
+//			m_height = m_screenHeight = config.video.windowedHeight;
+//			break;
+//		case M64ERR_SUCCESS:
+//			break;
+//		default:
+//			LOG(LOG_ERROR, "Error setting videomode %dx%d", m_screenWidth, m_screenHeight);
+//			m_width = m_screenWidth = config.video.windowedWidth;
+//			m_height = m_screenHeight = config.video.windowedHeight;
+//			FunctionWrapper::CoreVideo_Quit();
+//			return false;
+//	}
 	_setBufferSize();
 	opengl::Utils::isGLError(); // reset GL error.
 	return true;
