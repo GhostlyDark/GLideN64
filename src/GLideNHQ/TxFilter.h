@@ -70,15 +70,13 @@ public:
 				  int srcheight,
 				  ColorFormat srcformat,
 				  uint64 g64crc, /* glide64 crc, 64bit for future use */
-				  N64FormatSize n64FmtSz,
 				  GHQTexInfo *info);
   boolean hirestex(uint64 g64crc, /* glide64 crc, 64bit for future use */
-				   Checksum r_crc64,
+				   uint64 r_crc64,   /* checksum hi:palette low:texture */
 				   uint16 *palette,
-				   N64FormatSize n64FmtSz,
 				   GHQTexInfo *info);
   uint64 checksum64(uint8 *src, int width, int height, int size, int rowStride, uint8 *palette);
-  boolean dmptx(uint8 *src, int width, int height, int rowStridePixel, ColorFormat gfmt, N64FormatSize n64FmtSz, Checksum r_crc64);
+  boolean dmptx(uint8 *src, int width, int height, int rowStridePixel, ColorFormat gfmt, uint16 n64fmt, uint64 r_crc64);
   boolean reloadhirestex();
   void dumpcache();
 };
