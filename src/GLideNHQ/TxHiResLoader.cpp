@@ -163,7 +163,7 @@ uint32_t TxHiResLoader::checkFileName(char* ident, char* filename,
 	return length;
 }
 
-uint8_t* TxHiResLoader::loadFileInfoTex(FULLFNAME_CHARTYPE* fullfname, char* fname,
+uint8_t* TxHiResLoader::loadFileInfoTex(char* fname,
 	int siz, int* pWidth, int* pHeight,
 	uint32_t fmt,
 	ColorFormat* pFormat) const
@@ -183,14 +183,6 @@ uint8_t* TxHiResLoader::loadFileInfoTex(FULLFNAME_CHARTYPE* fullfname, char* fna
 	 * Format: 0 - RGBA, 1 - YUV, 2 - CI, 3 - IA, 4 - I
 	 * Size:   0 - 4bit, 1 - 8bit, 2 - 16bit, 3 - 32 bit
 	 */
-
-#ifdef _WIN32
-#define FOPEN _wfopen
-#define FOPEN_MODE L"rb"
-#else
-#define FOPEN fopen
-#define FOPEN_MODE "rb"
-#endif
 
 	uint8_t* tex = nullptr;
 	uint8_t* tmptex = nullptr;
@@ -223,28 +215,28 @@ uint8_t* TxHiResLoader::loadFileInfoTex(FULLFNAME_CHARTYPE* fullfname, char* fna
 		}
 		/* _a.png */
 		strcpy(pfname, "_a.png");
-		if ((fp = FOPEN(fullfname, FOPEN_MODE)) != nullptr) {
+		if ((fp = fopen(fname, "rb")) != nullptr) {
 			tmptex = _txImage->readPNG(fp, &tmpwidth, &tmpheight, &tmpformat);
 			fclose(fp);
 		}
 		if (!tmptex) {
 			/* _a.bmp */
 			strcpy(pfname, "_a.bmp");
-			if ((fp = FOPEN(fullfname, FOPEN_MODE)) != nullptr) {
+			if ((fp = fopen(fname, "rb")) != nullptr) {
 				tmptex = _txImage->readBMP(fp, &tmpwidth, &tmpheight, &tmpformat);
 				fclose(fp);
 			}
 		}
 		/* _rgb.png */
 		strcpy(pfname, "_rgb.png");
-		if ((fp = FOPEN(fullfname, FOPEN_MODE)) != nullptr) {
+		if ((fp = fopen(fname, "rb")) != nullptr) {
 			tex = _txImage->readPNG(fp, &width, &height, &format);
 			fclose(fp);
 		}
 		if (!tex) {
 			/* _rgb.bmp */
 			strcpy(pfname, "_rgb.bmp");
-			if ((fp = FOPEN(fullfname, FOPEN_MODE)) != nullptr) {
+			if ((fp = fopen(fname, "rb")) != nullptr) {
 				tex = _txImage->readBMP(fp, &width, &height, &format);
 				fclose(fp);
 			}
@@ -334,7 +326,7 @@ uint8_t* TxHiResLoader::loadFileInfoTex(FULLFNAME_CHARTYPE* fullfname, char* fna
 #endif
 				strstr(fname, "_ci.bmp")) {
 
-				if ((fp = FOPEN(fullfname, FOPEN_MODE)) != nullptr) {
+				if ((fp = fopen(fname, "rb")) != nullptr) {
 					if (strstr(fname, ".png"))
 						tex = _txImage->readPNG(fp, &width, &height, &format);
 					else
@@ -566,8 +558,6 @@ uint8_t* TxHiResLoader::loadFileInfoTex(FULLFNAME_CHARTYPE* fullfname, char* fna
 		}
 	}
 
-#undef FOPEN
-#undef FOPEN_MODE
 
 	/* last minute validations */
 	if (!tex || !width || !height || format == graphics::internalcolorFormat::NOCOLOR || width > _maxwidth || height > _maxheight) {
