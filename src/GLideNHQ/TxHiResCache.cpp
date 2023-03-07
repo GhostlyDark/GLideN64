@@ -197,8 +197,9 @@ TxHiResCache::LoadResult TxHiResCache::_loadHiResTextures(const wchar_t * dir_pa
 		// The array is empty,  break the current operation
 		if (foundfilename == nullptr)
 			break;
-
-		if (!checkFolderName(foundfilename))
+		// The current file is a hidden one
+		if (wccmp(foundfilename, wst(".")))
+			// These files we don't need
 			continue;
 
 		texturefilename.assign(dir_path);
