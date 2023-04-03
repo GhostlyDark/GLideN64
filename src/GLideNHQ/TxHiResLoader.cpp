@@ -9,7 +9,7 @@
 
 /* use power of 2 texture size
  * (0:disable, 1:enable, 2:3dfx) */
-#define POW2_TEXTURES 0
+#define POW2_TEXTURES 1
 
 /* use aggressive format assumption for quantization
  * (0:disable, 1:enable, 2:extreme) */
