@@ -609,17 +609,17 @@ TxFilter::dmptx(uint8 *src, int width, int height, int rowStridePixel, ColorForm
 		tmpbuf.assign(_dumpPath);
 		tmpbuf.append(wst("/"));
 		tmpbuf.append(_ident);
-		tmpbuf.append(wst("/GLideNHQ"));
+		tmpbuf.append(wst("/GLideNHQ_tex1"));
 		if (!osal_path_existsW(tmpbuf.c_str()) && osal_mkdirp(tmpbuf.c_str()) != 0)
 			return 0;
 
 		if (n64FmtSz._format == 0x2) {
 			wchar_t wbuf[256];
-			tx_swprintf(wbuf, 256, wst("/%ls#%08X#%01X#%01X#%08X_ciByRGBA.png"), _ident.c_str(), r_crc64._texture, n64FmtSz._format, n64FmtSz._size, r_crc64._palette);
+			tx_swprintf(wbuf, 256, wst("/%ls#%08X#%01X#%01X#%08X_ciByRGBA_tex1_%dx%d.png"), _ident.c_str(), r_crc64._texture, n64FmtSz._format, n64FmtSz._size, r_crc64._palette, width, height);
 			tmpbuf.append(wbuf);
 		} else {
 			wchar_t wbuf[256];
-			tx_swprintf(wbuf, 256, wst("/%ls#%08X#%01X#%01X_all.png"), _ident.c_str(), r_crc64._texture, n64FmtSz._format, n64FmtSz._size);
+			tx_swprintf(wbuf, 256, wst("/%ls#%08X#%01X#%01X_all_tex1_%dx%d.png"), _ident.c_str(), r_crc64._texture, n64FmtSz._format, n64FmtSz._size, width, height);
 			tmpbuf.append(wbuf);
 		}
 
