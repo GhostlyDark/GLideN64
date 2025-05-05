@@ -144,6 +144,8 @@ void DisplayWindow::updateScale()
 
 void DisplayWindow::_setBufferSize()
 {
+float aspect_ratio = static_cast<f32>(VI.width) / static_cast<f32>(VI.height);
+
 	m_bAdjustScreen = false;
 	switch (config.frameBufferEmulation.aspect) {
 	case Config::aStretch: // stretch
@@ -151,27 +153,54 @@ void DisplayWindow::_setBufferSize()
 		m_height = m_screenHeight;
 		break;
 	case Config::a43: // force 4/3
-		if (m_screenWidth * 3 / 4 > m_screenHeight) {
-			m_height = m_screenHeight;
-			m_width = m_screenHeight * 4 / 3;
-		} else if (m_screenHeight * 4 / 3 > m_screenWidth) {
-			m_width = m_screenWidth;
-			m_height = m_screenWidth * 3 / 4;
-		} else {
-			m_width = m_screenWidth;
-			m_height = m_screenHeight;
+		if (aspect_ratio > 1.7f && aspect_ratio < 1.8f) {
+			if (m_screenWidth * 9 / 16 > m_screenHeight) {
+				m_height = m_screenHeight;
+				m_width = m_screenHeight * 16 / 9;
+			} else if (m_screenHeight * 16 / 9 > m_screenWidth) {
+				m_width = m_screenWidth;
+				m_height = m_screenWidth * 9 / 16;
+			} else {
+				m_width = m_screenWidth;
+				m_height = m_screenHeight;
+			}
+		}
+		else {
+			if (m_screenWidth * 3 / 4 > m_screenHeight) {
+				m_height = m_screenHeight;
+				m_width = m_screenHeight * 4 / 3;
+			} else if (m_screenHeight * 4 / 3 > m_screenWidth) {
+				m_width = m_screenWidth;
+				m_height = m_screenWidth * 3 / 4;
+			} else {
+				m_width = m_screenWidth;
+				m_height = m_screenHeight;
+			}
 		}
 		break;
 	case Config::a169: // force 16/9
-		if (m_screenWidth * 9 / 16 > m_screenHeight) {
-			m_height = m_screenHeight;
-			m_width = m_screenHeight * 16 / 9;
-		} else if (m_screenHeight * 16 / 9 > m_screenWidth) {
-			m_width = m_screenWidth;
-			m_height = m_screenWidth * 9 / 16;
+		if (aspect_ratio <= 1.7f || aspect_ratio >= 1.8f) {
+			if (m_screenWidth * 3 / 4 > m_screenHeight) {
+				m_height = m_screenHeight;
+				m_width = m_screenHeight * 4 / 3;
+			} else if (m_screenHeight * 4 / 3 > m_screenWidth) {
+				m_width = m_screenWidth;
+				m_height = m_screenWidth * 3 / 4;
+			} else {
+				m_width = m_screenWidth;
+				m_height = m_screenHeight;
+			}
 		} else {
-			m_width = m_screenWidth;
-			m_height = m_screenHeight;
+			if (m_screenWidth * 9 / 16 > m_screenHeight) {
+				m_height = m_screenHeight;
+				m_width = m_screenHeight * 16 / 9;
+			} else if (m_screenHeight * 16 / 9 > m_screenWidth) {
+				m_width = m_screenWidth;
+				m_height = m_screenWidth * 9 / 16;
+			} else {
+				m_width = m_screenWidth;
+				m_height = m_screenHeight;
+			}
 		}
 		break;
 	case Config::aAdjust43: // adjust
