@@ -142,6 +142,13 @@ void DisplayWindowWindows::_changeWindow()
 		SetWindowLong( hWnd, GWL_EXSTYLE, WS_EX_APPWINDOW | WS_EX_TOPMOST );
 		SetWindowLong( hWnd, GWL_STYLE, WS_POPUP );
 
+		LONG style = GetWindowLong(hWnd, GWL_STYLE);
+
+		if ((style & (WS_SIZEBOX | WS_MAXIMIZEBOX)) == 0) {
+			style |= WS_SIZEBOX | WS_MAXIMIZEBOX;
+			SetWindowLong(hWnd, GWL_STYLE, style);
+		}
+
 		GetWindowRect( hWnd, &windowedRect );
 
 		m_bFullscreen = true;
