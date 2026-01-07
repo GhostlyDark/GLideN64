@@ -22,6 +22,16 @@ set(GLideNHQ_SOURCES
   TxUtil.cpp
 )
 
+list(APPEND GLideNHQ_SOURCES
+  zstd/zstd.c
+  zstd/zstd_zlibwrapper.c
+  zstd/gzclose.c
+  zstd/gzlib.c
+  zstd/gzread.c
+  zstd/gzwrite.c
+)
+add_definitions( -DZWRAP_USE_ZSTD )
+
 if(MINGW OR PANDORA OR BCMHOST)
   include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/../osal )
 else(MINGW OR PANDORA OR BCMHOST)

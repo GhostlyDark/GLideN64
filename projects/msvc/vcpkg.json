@@ -2,6 +2,7 @@
   "dependencies": [
     "libpng",
     "zlib",
-    "freetype"
+    "freetype",
+	"zstd"
   ]
 }
