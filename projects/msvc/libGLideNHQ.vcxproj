@@ -55,12 +55,12 @@
   <ItemDefinitionGroup>
     <ClCompile>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\src;$(ProjectDir)..\..\src\inc;$(ProjectDir)..\..\src\osal;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <CompileAs>CompileAsCpp</CompileAs>
+      <CompileAs>Default</CompileAs>
       <ExceptionHandling>Sync</ExceptionHandling>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>UNICODE;WIN32;_WINDOWS;_CRT_SECURE_NO_WARNINGS;OS_WINDOWS;__MSC__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>UNICODE;WIN32;_WINDOWS;_CRT_SECURE_NO_WARNINGS;OS_WINDOWS;__MSC__;ZWRAP_USE_ZSTD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <ObjectFileName>$(IntDir)</ObjectFileName>
     </ClCompile>
@@ -142,6 +142,11 @@
     <ClCompile Include="..\..\src\GLideNHQ\TxReSample.cpp" />
     <ClCompile Include="..\..\src\GLideNHQ\TxTexCache.cpp" />
     <ClCompile Include="..\..\src\GLideNHQ\TxUtil.cpp" />
+    <ClCompile Include="..\..\src\GLideNHQ\zstd\zstd_zlibwrapper.c" />
+    <ClCompile Include="..\..\src\GLideNHQ\zstd\gzclose.c" />
+    <ClCompile Include="..\..\src\GLideNHQ\zstd\gzlib.c" />
+    <ClCompile Include="..\..\src\GLideNHQ\zstd\gzread.c" />
+    <ClCompile Include="..\..\src\GLideNHQ\zstd\gzwrite.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
