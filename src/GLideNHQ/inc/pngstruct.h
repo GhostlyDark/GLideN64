@@ -27,7 +27,13 @@
    /* We must ensure that zlib uses 'const' in declarations. */
 #  define ZLIB_CONST
 #endif
+
+#ifdef ZWRAP_USE_ZSTD
+#include "zlibWrapper/zstd_zlibwrapper.h"
+#else
 #include "zlib.h"
+#endif
+
 #ifdef const
    /* zlib.h sometimes #defines const to nothing, undo this. */
 #  undef const
