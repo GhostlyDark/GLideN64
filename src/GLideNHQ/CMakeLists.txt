@@ -22,6 +22,18 @@ set(GLideNHQ_SOURCES
   TxUtil.cpp
 )
 
+list(APPEND GLideNHQ_SOURCES
+  zstd/zlibWrapper/gzclose.c
+  zstd/zlibWrapper/gzlib.c
+  zstd/zlibWrapper/gzread.c
+  zstd/zlibWrapper/gzwrite.c
+  zstd/zlibWrapper/zstd_zlibwrapper.c
+)
+
+add_definitions(-DZWRAP_USE_ZSTD=1)
+
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/zstd/build/cmake)
+
 if(MINGW OR PANDORA OR BCMHOST)
   include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/../osal )
 else(MINGW OR PANDORA OR BCMHOST)
@@ -92,6 +104,7 @@ if( GLIDEN64_BUILD_TYPE STREQUAL "Debug")
       ${PNG_LIBRARIES}
       ${ZLIB_LIBRARIES}
       osald
+      libzstd_static
     )
   elseif(ANDROID)
       target_link_libraries(GLideNHQ PRIVATE
@@ -99,6 +112,7 @@ if( GLIDEN64_BUILD_TYPE STREQUAL "Debug")
               z
               dl
               osal
+              libzstd_static
               )
   else(MINGW OR BCMHOST OR APPLE OR USE_SYSTEM_LIBS)
     target_link_libraries(GLideNHQd PRIVATE
@@ -106,6 +120,7 @@ if( GLIDEN64_BUILD_TYPE STREQUAL "Debug")
       ${CMAKE_CURRENT_SOURCE_DIR}/lib/libz.a
       dl
       osald
+      libzstd_static
     )
   endif(MINGW OR BCMHOST OR APPLE OR USE_SYSTEM_LIBS)
 else( GLIDEN64_BUILD_TYPE STREQUAL "Debug")
@@ -121,6 +136,7 @@ else( GLIDEN64_BUILD_TYPE STREQUAL "Debug")
       /mnt/utmp/codeblocks/usr/lib/libpng.a
       /mnt/utmp/codeblocks/usr/lib/libz.a
       osal
+      libzstd_static
     )
   elseif(BCMHOST OR MINGW OR APPLE OR USE_SYSTEM_LIBS)
     FIND_PACKAGE( ZLIB REQUIRED )
@@ -129,6 +145,7 @@ else( GLIDEN64_BUILD_TYPE STREQUAL "Debug")
       ${PNG_LIBRARIES}
       ${ZLIB_LIBRARIES}
       osal
+      libzstd_static
     )
   elseif(ANDROID)
     target_link_libraries(GLideNHQ PRIVATE
@@ -136,6 +153,7 @@ else( GLIDEN64_BUILD_TYPE STREQUAL "Debug")
       z
       dl
       osal
+      libzstd_static
     )
   else(PANDORA)
     target_link_libraries(GLideNHQ PRIVATE
@@ -143,6 +161,7 @@ else( GLIDEN64_BUILD_TYPE STREQUAL "Debug")
       ${CMAKE_CURRENT_SOURCE_DIR}/lib/libz.a
       dl
       osal
+      libzstd_static
     )
   endif(PANDORA)
 endif( GLIDEN64_BUILD_TYPE STREQUAL "Debug")

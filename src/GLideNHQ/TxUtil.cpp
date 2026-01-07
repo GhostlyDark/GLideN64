@@ -24,7 +24,7 @@
 #include <thread>
 #include "TxUtil.h"
 #include "TxDbg.h"
-#include <zlib.h>
+#include "zstd/zlibWrapper/zstd_zlibwrapper.h"
 #include <assert.h>
 
 #if defined (OS_WINDOWS)
