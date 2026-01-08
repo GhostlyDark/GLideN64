@@ -66,6 +66,7 @@ void CTextureEnhancementTab::ApplyLanguage(void)
 	SetDlgItemTextW(IDC_TEXTURE_FILTER_CACHE_STATIC, wGS(TEXTURE_SIZE_OF_MEMORY_CACHE).c_str());
 	SetDlgItemTextW(IDC_CHK_SAVE_TEXTURE_CACHE, wGS(TEXTURE_SAVE_ENHANCED).c_str());
 	SetDlgItemTextW(IDC_CHK_COMPRESS_CACHE, wGS(TEXTURE_COMPRESS_CACHE).c_str());
+	SetDlgItemTextW(IDC_CHK_COMPRESS_ZSTD, wGS(IDC_CHK_COMPRESS_ZSTD).c_str());
 	SetDlgItemTextW(IDC_CHK_FORCE_16BPP, wGS(TEXTURE_CONVERT_16BPP).c_str());
 
 	std::wstring tooltip = wGS(TEXTURE_N64_FILTER_TOOLTIP);
@@ -94,6 +95,8 @@ void CTextureEnhancementTab::ApplyLanguage(void)
 	TTSetTxt(GetDlgItem(IDC_CHK_SAVE_TEXTURE_CACHE), tooltip.c_str());
 	tooltip = wGS(TEXTURE_COMPRESS_CACHE_TOOLTIP);
 	TTSetTxt(GetDlgItem(IDC_CHK_COMPRESS_CACHE), tooltip.c_str());
+	tooltip = wGS(TEXTURE_COMPRESS_ZSTD);
+	TTSetTxt(GetDlgItem(IDC_CHK_COMPRESS_ZSTD), tooltip.c_str());
 	tooltip = wGS(TEXTURE_CONVERT_16BPP_TOOLTIP);
 	TTSetTxt(GetDlgItem(IDC_CHK_FORCE_16BPP), tooltip.c_str());
 
@@ -189,6 +192,7 @@ void CTextureEnhancementTab::LoadSettings(bool /*blockCustomSettings*/)
 	CButton(GetDlgItem(IDC_CHK_HIRES_TEX_FILESTORAGE)).SetCheck(config.textureFilter.txHiresTextureFileStorage != 0 ? BST_CHECKED : BST_UNCHECKED);
 	CButton(GetDlgItem(IDC_CHK_SAVE_TEXTURE_CACHE)).SetCheck(config.textureFilter.txSaveCache != 0 ? BST_CHECKED : BST_UNCHECKED);
 	CButton(GetDlgItem(IDC_CHK_COMPRESS_CACHE)).SetCheck(config.textureFilter.txCacheCompression != 0 ? BST_CHECKED : BST_UNCHECKED);
+	CButton(GetDlgItem(IDC_CHK_COMPRESS_ZSTD)).SetCheck(config.textureFilter.txCacheZSTD != 0 ? BST_CHECKED : BST_UNCHECKED);
 	CButton(GetDlgItem(IDC_CHK_FORCE_16BPP)).SetCheck(config.textureFilter.txForce16bpp != 0 ? BST_CHECKED : BST_UNCHECKED);
 
 	m_TextureFilterCacheSpin.SetPos((config.textureFilter.txCacheSize / gc_uMegabyte) /  50);
@@ -248,6 +252,7 @@ void CTextureEnhancementTab::SaveSettings()
 	config.textureFilter.txCacheSize = m_TextureFilterCacheSpin.GetPos() * gc_uMegabyte * 50;
 	config.textureFilter.txSaveCache = CButton(GetDlgItem(IDC_CHK_SAVE_TEXTURE_CACHE)).GetCheck() == BST_CHECKED ? 1 : 0;
 	config.textureFilter.txCacheCompression = CButton(GetDlgItem(IDC_CHK_COMPRESS_CACHE)).GetCheck() == BST_CHECKED ? 1 : 0;
+	config.textureFilter.txCacheZSTD = CButton(GetDlgItem(IDC_CHK_COMPRESS_ZSTD)).GetCheck() == BST_CHECKED ? 1 : 0;
 	config.textureFilter.txForce16bpp = CButton(GetDlgItem(IDC_CHK_FORCE_16BPP)).GetCheck() == BST_CHECKED ? 1 : 0;
 }
 

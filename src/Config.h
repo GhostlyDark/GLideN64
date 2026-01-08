@@ -175,6 +175,7 @@ struct Config
 
 		u32 txForce16bpp;				// Force use 16bit color textures
 		u32 txCacheCompression;			// Zip textures cache
+		u32 txCacheZSTD;		        // Use zstd instead of zlib for compressed texture cache
 		u32 txSaveCache;				// Save texture cache to hard disk
 		u32 txDump;                     // Dump textures
 		u32 txStrongCRC;                // Dump textures with alternative (strong) CRC

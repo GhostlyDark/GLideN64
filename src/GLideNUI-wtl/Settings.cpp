@@ -100,6 +100,7 @@ void _loadSettings(GlSettings & settings)
 	config.textureFilter.txHresAltCRC = settings.value("txHresAltCRC", config.textureFilter.txHresAltCRC).toInt();
 	config.textureFilter.txForce16bpp = settings.value("txForce16bpp", config.textureFilter.txForce16bpp).toInt();
 	config.textureFilter.txCacheCompression = settings.value("txCacheCompression", config.textureFilter.txCacheCompression).toInt();
+	config.textureFilter.txCacheZSTD = settings.value("txCacheZSTD", config.textureFilter.txCacheZSTD).toInt();
 	config.textureFilter.txSaveCache = settings.value("txSaveCache", config.textureFilter.txSaveCache).toInt();
 	config.textureFilter.txEnhancedTextureFileStorage = settings.value("txEnhancedTextureFileStorage", config.textureFilter.txEnhancedTextureFileStorage).toInt();
 	config.textureFilter.txHiresTextureFileStorage = settings.value("txHiresTextureFileStorage", config.textureFilter.txHiresTextureFileStorage).toInt();
@@ -285,6 +286,7 @@ void writeSettings(const char * _strIniFolder)
 		settings.setValue("txHresAltCRC", config.textureFilter.txHresAltCRC);
 		settings.setValue("txForce16bpp", config.textureFilter.txForce16bpp);
 		settings.setValue("txCacheCompression", config.textureFilter.txCacheCompression);
+		settings.setValue("txCacheZSTD", config.textureFilter.txCacheZSTD);
 		settings.setValue("txSaveCache", config.textureFilter.txSaveCache);
 		settings.setValue("txEnhancedTextureFileStorage", config.textureFilter.txEnhancedTextureFileStorage);
 		settings.setValue("txHiresTextureFileStorage", config.textureFilter.txHiresTextureFileStorage);
@@ -486,6 +488,7 @@ void saveCustomRomSettings(const char * _strIniFolder, const char * _strRomName)
 	WriteCustomSetting(textureFilter, txHresAltCRC);
 	WriteCustomSetting(textureFilter, txForce16bpp);
 	WriteCustomSetting(textureFilter, txCacheCompression);
+	WriteCustomSetting(textureFilter, txCacheZSTD);
 	WriteCustomSetting(textureFilter, txSaveCache);
 	WriteCustomSettingS(txPath);
 	WriteCustomSettingS(txCachePath);

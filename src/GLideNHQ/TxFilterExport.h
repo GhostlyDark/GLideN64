@@ -90,6 +90,7 @@ typedef unsigned char boolean;
 #define FILE_HIRESTEXCACHE  0x00200000
 #define GZ_TEXCACHE         0x00400000
 #define GZ_HIRESTEXCACHE    0x00800000
+//#define GZ_ZSTD           0x00C00000
 #define DUMP_TEXCACHE       0x01000000
 #define DUMP_HIRESTEXCACHE  0x02000000
 #define DUMP_STRONG_CRC     0x04000000

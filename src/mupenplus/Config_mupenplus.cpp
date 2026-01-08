@@ -253,6 +253,8 @@ bool Config_SetDefault()
 	assert(res == M64ERR_SUCCESS);
 	res = ConfigSetDefaultBool(g_configVideoGliden64, "txCacheCompression", config.textureFilter.txCacheCompression, "Zip texture cache.");
 	assert(res == M64ERR_SUCCESS);
+	res = ConfigSetDefaultBool(g_configVideoGliden64, "txCacheZSTD", config.textureFilter.txCacheZSTD, "Use zstd instead of zlib for compressed texture cache.");
+	assert(res == M64ERR_SUCCESS);
 	res = ConfigSetDefaultBool(g_configVideoGliden64, "txForce16bpp", config.textureFilter.txForce16bpp, "Force the use of 16-bit texture formats for HD textures.");
 	assert(res == M64ERR_SUCCESS);
 	res = ConfigSetDefaultBool(g_configVideoGliden64, "txSaveCache", config.textureFilter.txSaveCache, "Save texture cache to hard disk.");
@@ -477,6 +479,8 @@ void Config_LoadCustomConfig()
 	if (result == M64ERR_SUCCESS) config.textureFilter.txForce16bpp = atoi(value);
 	result = ConfigExternalGetParameter(fileHandle, sectionName, "textureFilter\\txCacheCompression", value, sizeof(value));
 	if (result == M64ERR_SUCCESS) config.textureFilter.txCacheCompression = atoi(value);
+	result = ConfigExternalGetParameter(fileHandle, sectionName, "textureFilter\\txCacheZSTD", value, sizeof(value));
+	if (result == M64ERR_SUCCESS) config.textureFilter.txCacheZSTD = atoi(value);
 	result = ConfigExternalGetParameter(fileHandle, sectionName, "textureFilter\\txSaveCache", value, sizeof(value));
 	if (result == M64ERR_SUCCESS) config.textureFilter.txSaveCache = atoi(value);
 	result = ConfigExternalGetParameter(fileHandle, sectionName, "textureFilter\\txDump", value, sizeof(value));
@@ -577,6 +581,7 @@ void Config_LoadConfig()
 	config.textureFilter.txHresAltCRC = ConfigGetParamBool(g_configVideoGliden64, "txHresAltCRC");
 	config.textureFilter.txForce16bpp = ConfigGetParamBool(g_configVideoGliden64, "txForce16bpp");
 	config.textureFilter.txCacheCompression = ConfigGetParamBool(g_configVideoGliden64, "txCacheCompression");
+	config.textureFilter.txCacheZSTD = ConfigGetParamBool(g_configVideoGliden64, "txCacheZSTD");
 	config.textureFilter.txSaveCache = ConfigGetParamBool(g_configVideoGliden64, "txSaveCache");
 	config.textureFilter.txDump = ConfigGetParamBool(g_configVideoGliden64, "txDump");
 	config.textureFilter.txStrongCRC = ConfigGetParamBool(g_configVideoGliden64, "txStrongCRC");

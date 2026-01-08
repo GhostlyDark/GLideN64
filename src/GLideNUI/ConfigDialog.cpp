@@ -378,6 +378,7 @@ void ConfigDialog::_init(bool reInit, bool blockCustomSettings)
 	ui->strongCRCCheckBox->setChecked(config.textureFilter.txStrongCRC != 0);
 	ui->force16bppCheckBox->setChecked(config.textureFilter.txForce16bpp != 0);
 	ui->compressCacheCheckBox->setChecked(config.textureFilter.txCacheCompression != 0);
+	ui->compressZSTDCheckBox->setChecked(config.textureFilter.txCacheZSTD != 0);
 	ui->saveTextureCacheCheckBox->setChecked(config.textureFilter.txSaveCache != 0);
 	ui->enhancedTexFileStorageCheckBox->setChecked(config.textureFilter.txEnhancedTextureFileStorage != 0);
 	ui->hiresTexFileStorageCheckBox->setChecked(config.textureFilter.txHiresTextureFileStorage != 0);
@@ -695,6 +696,7 @@ void ConfigDialog::accept(bool justSave) {
 	config.textureFilter.txStrongCRC = ui->strongCRCCheckBox->isChecked() ? 1 : 0;
 
 	config.textureFilter.txCacheCompression = ui->compressCacheCheckBox->isChecked() ? 1 : 0;
+	config.textureFilter.txCacheZSTD = ui->compressZSTDCheckBox->isChecked() ? 1 : 0;
 	config.textureFilter.txForce16bpp = ui->force16bppCheckBox->isChecked() ? 1 : 0;
 	config.textureFilter.txSaveCache = ui->saveTextureCacheCheckBox->isChecked() ? 1 : 0;
 	config.textureFilter.txEnhancedTextureFileStorage = ui->enhancedTexFileStorageCheckBox->isChecked() ? 1 : 0;

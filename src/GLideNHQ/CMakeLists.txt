@@ -30,8 +30,6 @@ list(APPEND GLideNHQ_SOURCES
   zstd/zlibWrapper/zstd_zlibwrapper.c
 )
 
-add_definitions(-DZWRAP_USE_ZSTD=1)
-
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/zstd/build/cmake)
 
 if(MINGW OR PANDORA OR BCMHOST)
