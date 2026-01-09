@@ -27,8 +27,13 @@
 
 #include <fstream>
 #include <unordered_map>
-#include "zstd/zlibWrapper/zstd_zlibwrapper.h"
-#include "Config.h"
+
+#ifdef ZWRAP_USE_ZSTD
+#include "zlibWrapper/zstd_zlibwrapper.h"
+#else
+#include <zlib.h>
+#endif
+
 #include <memory.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -176,13 +181,9 @@ bool TxMemoryCache::add(Checksum checksum, GHQTexInfo* info, int dataSize)
 		if (_options & (GZ_TEXCACHE | GZ_HIRESTEXCACHE)) {
 			/* zlib compress it. compression level:1 (best speed) */
 
-			/* enable zstd */
-			if (config.textureFilter.txCacheZSTD)
-				ZWRAP_useZSTDcompression(1);
-
 			uLongf destLen = _gzdestLen;
 			dest = (dest == _gzdest0) ? _gzdest1 : _gzdest0;
-			if (compress2(dest, &destLen, info->data, dataSize, (config.textureFilter.txCacheZSTD) ? 9 : 1) != Z_OK) {
+			if (compress2(dest, &destLen, info->data, dataSize, ZWRAP_USE_ZSTD ? 9 : 1) != Z_OK) {
 				dest = info->data;
 				DBG_INFO(80, wst("Error: zlib compression failed!\n"));
 			} else {
@@ -765,13 +766,9 @@ bool TxFileStorage::add(Checksum checksum, GHQTexInfo *info, int dataSize)
 		if (_options & (GZ_TEXCACHE | GZ_HIRESTEXCACHE)) {
 			/* zlib compress it. compression level:1 (best speed) */
 
-			/* enable zstd */
-			if (config.textureFilter.txCacheZSTD)
-				ZWRAP_useZSTDcompression(1);
-
 			uLongf destLen = _gzdestLen;
 			dest = (dest == _gzdest0) ? _gzdest1 : _gzdest0;
-			if (compress2(dest, &destLen, info->data, dataSize, (config.textureFilter.txCacheZSTD) ? 9 : 1) != Z_OK) {
+			if (compress2(dest, &destLen, info->data, dataSize, ZWRAP_USE_ZSTD ? 9 : 1) != Z_OK) {
 				dest = info->data;
 				DBG_INFO(80, wst("Error: zlib compression failed!\n"));
 			} else {

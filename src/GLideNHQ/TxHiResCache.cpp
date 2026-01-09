@@ -32,7 +32,13 @@
 #include "TxDbg.h"
 #include <osal_files.h>
 #include <osal_keys.h>
-#include "zstd/zlibWrapper/zstd_zlibwrapper.h"
+
+#ifdef ZWRAP_USE_ZSTD
+#include "zlibWrapper/zstd_zlibwrapper.h"
+#else
+#include <zlib.h>
+#endif
+
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>

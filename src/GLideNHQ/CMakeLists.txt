@@ -23,14 +23,12 @@ set(GLideNHQ_SOURCES
 )
 
 list(APPEND GLideNHQ_SOURCES
-  zstd/zlibWrapper/gzclose.c
-  zstd/zlibWrapper/gzlib.c
-  zstd/zlibWrapper/gzread.c
-  zstd/zlibWrapper/gzwrite.c
-  zstd/zlibWrapper/zstd_zlibwrapper.c
+  zlibWrapper/gzclose.c
+  zlibWrapper/gzlib.c
+  zlibWrapper/gzread.c
+  zlibWrapper/gzwrite.c
+  zlibWrapper/zstd_zlibwrapper.c
 )
-
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/zstd/build/cmake)
 
 if(MINGW OR PANDORA OR BCMHOST)
   include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/../osal )
@@ -98,27 +96,52 @@ if( GLIDEN64_BUILD_TYPE STREQUAL "Debug")
   if(MINGW OR BCMHOST OR APPLE OR USE_SYSTEM_LIBS)
     FIND_PACKAGE( ZLIB REQUIRED )
     FIND_PACKAGE( PNG REQUIRED )
+    FIND_PACKAGE( ZSTD )
+
+    if(${ZSTD_FOUND})
+      add_definitions( -DZWRAP_USE_ZSTD=1 )
+      SET( ZSTD_PACKAGE "zstd::libzstd_static" )
+    else(${ZSTD_FOUND})
+      SET( ZSTD_PACKAGE "" )
+    endif(${ZSTD_FOUND})
+
     target_link_libraries(GLideNHQd
       ${PNG_LIBRARIES}
       ${ZLIB_LIBRARIES}
+      ${ZSTD_PACKAGE}
       osald
-      libzstd_static
     )
   elseif(ANDROID)
+
+      if(EXISTS "${ANDROID_LIB_PATH}/libs/${BUILD_VARIANT}/${ANDROID_ABI}/libzstd.a")
+        add_definitions( -DZWRAP_USE_ZSTD=1 )
+        SET( ZSTD_PACKAGE "${ANDROID_LIB_PATH}/libs/${BUILD_VARIANT}/${ANDROID_ABI}/libzstd.a" )
+      else()
+        SET( ZSTD_PACKAGE "" )
+      endif()
+
       target_link_libraries(GLideNHQ PRIVATE
               ${ANDROID_LIB_PATH}/libs/${BUILD_VARIANT}/${ANDROID_ABI}/libpng.a
+              ${ZSTD_PACKAGE}
               z
               dl
               osal
-              libzstd_static
               )
   else(MINGW OR BCMHOST OR APPLE OR USE_SYSTEM_LIBS)
+
+	if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/lib/libzstd.a")
+      add_definitions( -DZWRAP_USE_ZSTD=1 )
+      SET( ZSTD_PACKAGE "${CMAKE_CURRENT_SOURCE_DIR}/lib/libzstd.a" )
+	else()
+      SET( ZSTD_PACKAGE "" )
+	endif()
+
     target_link_libraries(GLideNHQd PRIVATE
       ${CMAKE_CURRENT_SOURCE_DIR}/lib/libpng.a
       ${CMAKE_CURRENT_SOURCE_DIR}/lib/libz.a
+      ${ZSTD_PACKAGE}
       dl
       osald
-      libzstd_static
     )
   endif(MINGW OR BCMHOST OR APPLE OR USE_SYSTEM_LIBS)
 else( GLIDEN64_BUILD_TYPE STREQUAL "Debug")
@@ -130,36 +153,69 @@ else( GLIDEN64_BUILD_TYPE STREQUAL "Debug")
 #  find_library(PNGLIB libpng.a)
 
   if(PANDORA)
+
+	if(EXISTS "/mnt/utmp/codeblocks/usr/lib/libzstd.a")
+      add_definitions( -DZWRAP_USE_ZSTD=1 )
+      SET( ZSTD_PACKAGE "/mnt/utmp/codeblocks/usr/lib/libzstd.a" )
+	else()
+      SET( ZSTD_PACKAGE "" )
+	endif()
+
     target_link_libraries(GLideNHQ PRIVATE
       /mnt/utmp/codeblocks/usr/lib/libpng.a
       /mnt/utmp/codeblocks/usr/lib/libz.a
+      ${ZSTD_PACKAGE}
       osal
-      libzstd_static
     )
   elseif(BCMHOST OR MINGW OR APPLE OR USE_SYSTEM_LIBS)
     FIND_PACKAGE( ZLIB REQUIRED )
     FIND_PACKAGE( PNG REQUIRED )
+    FIND_PACKAGE( ZSTD )
+
+    if(${ZSTD_FOUND})
+      add_definitions( -DZWRAP_USE_ZSTD=1 )
+      SET( ZSTD_PACKAGE "zstd::libzstd_static" )
+    else(${ZSTD_FOUND})
+      SET( ZSTD_PACKAGE "" )
+    endif(${ZSTD_FOUND})
+
     target_link_libraries(GLideNHQ
       ${PNG_LIBRARIES}
       ${ZLIB_LIBRARIES}
+      ${ZSTD_PACKAGE}
       osal
-      libzstd_static
     )
   elseif(ANDROID)
+
+	if(EXISTS "${ANDROID_LIB_PATH}/libs/${BUILD_VARIANT}/${ANDROID_ABI}/libzstd.a")
+      add_definitions( -DZWRAP_USE_ZSTD=1 )
+      SET( ZSTD_PACKAGE "${ANDROID_LIB_PATH}/libs/${BUILD_VARIANT}/${ANDROID_ABI}/libzstd.a" )
+	else()
+      SET( ZSTD_PACKAGE "" )
+	endif()
+
     target_link_libraries(GLideNHQ PRIVATE
       ${ANDROID_LIB_PATH}/libs/${BUILD_VARIANT}/${ANDROID_ABI}/libpng.a
+      ${ZSTD_PACKAGE}
       z
       dl
       osal
-      libzstd_static
     )
   else(PANDORA)
+
+	if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/lib/libzstd.a")
+      add_definitions( -DZWRAP_USE_ZSTD=1 )
+      SET( ZSTD_PACKAGE "${CMAKE_CURRENT_SOURCE_DIR}/lib/libzstd.a" )
+	else()
+      SET( ZSTD_PACKAGE "" )
+	endif()
+
     target_link_libraries(GLideNHQ PRIVATE
       ${CMAKE_CURRENT_SOURCE_DIR}/lib/libpng.a
       ${CMAKE_CURRENT_SOURCE_DIR}/lib/libz.a
+      ${ZSTD_PACKAGE}
       dl
       osal
-      libzstd_static
     )
   endif(PANDORA)
 endif( GLIDEN64_BUILD_TYPE STREQUAL "Debug")

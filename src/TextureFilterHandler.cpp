@@ -51,8 +51,6 @@ u32 TextureFilterHandler::_getConfigOptions() const
 		options |= FORCE16BPP_TEX | FORCE16BPP_HIRESTEX;
 	if (config.textureFilter.txCacheCompression)
 		options |= GZ_TEXCACHE | GZ_HIRESTEXCACHE;
-//	if (config.textureFilter.txCacheZSTD)
-//		options |= GZ_ZSTD;
 	if (config.textureFilter.txSaveCache)
 		options |= (DUMP_TEXCACHE | DUMP_HIRESTEXCACHE);
 	if (config.textureFilter.txHiresFullAlphaChannel)
