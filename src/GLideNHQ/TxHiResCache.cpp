@@ -34,8 +34,10 @@
 #include <osal_keys.h>
 
 #ifdef ZWRAP_USE_ZSTD
+#define ZWRAP_USE_ZSTD 1
 #include "zlibWrapper/zstd_zlibwrapper.h"
 #else
+#define ZWRAP_USE_ZSTD 0
 #include <zlib.h>
 #endif
 
