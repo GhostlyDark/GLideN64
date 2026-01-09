@@ -28,13 +28,7 @@
 #include <fstream>
 #include <unordered_map>
 
-#ifdef ZWRAP_USE_ZSTD
-#define USE_ZSTD 1
 #include "zlibWrapper/zstd_zlibwrapper.h"
-#else
-#define USE_ZSTD 0
-#include <zlib.h>
-#endif
 
 #include <memory.h>
 #include <stdlib.h>
@@ -185,7 +179,7 @@ bool TxMemoryCache::add(Checksum checksum, GHQTexInfo* info, int dataSize)
 
 			uLongf destLen = _gzdestLen;
 			dest = (dest == _gzdest0) ? _gzdest1 : _gzdest0;
-			if (compress2(dest, &destLen, info->data, dataSize, USE_ZSTD ? 9 : 1) != Z_OK) {
+			if (compress2(dest, &destLen, info->data, dataSize, 9) != Z_OK) {
 				dest = info->data;
 				DBG_INFO(80, wst("Error: zlib compression failed!\n"));
 			} else {
@@ -770,7 +764,7 @@ bool TxFileStorage::add(Checksum checksum, GHQTexInfo *info, int dataSize)
 
 			uLongf destLen = _gzdestLen;
 			dest = (dest == _gzdest0) ? _gzdest1 : _gzdest0;
-			if (compress2(dest, &destLen, info->data, dataSize, USE_ZSTD ? 9 : 1) != Z_OK) {
+			if (compress2(dest, &destLen, info->data, dataSize, 9) != Z_OK) {
 				dest = info->data;
 				DBG_INFO(80, wst("Error: zlib compression failed!\n"));
 			} else {

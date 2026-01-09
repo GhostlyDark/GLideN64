@@ -29,11 +29,7 @@
 #include "TxDbg.h"
 #include <osal_files.h>
 
-#ifdef ZWRAP_USE_ZSTD
 #include "zlibWrapper/zstd_zlibwrapper.h"
-#else
-#include <zlib.h>
-#endif
 
 #define TEXCACHE_DUMP_ENABLED (FILE_TEXCACHE|DUMP_TEXCACHE)
 

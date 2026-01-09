@@ -25,11 +25,7 @@
 #include "TxUtil.h"
 #include "TxDbg.h"
 
-#ifdef ZWRAP_USE_ZSTD
 #include "zlibWrapper/zstd_zlibwrapper.h"
-#else
-#include <zlib.h>
-#endif
 
 #include <assert.h>
 
