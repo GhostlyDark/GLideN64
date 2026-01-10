@@ -30,11 +30,11 @@
 
 #ifdef ZWRAP_USE_ZSTD
 #define USE_ZSTD 1
-#include "zlibWrapper/zstd_zlibwrapper.h"
 #else
 #define USE_ZSTD 0
-#include <zlib.h>
 #endif
+
+#include "zlibWrapper/zstd_zlibwrapper.h"
 
 #include <memory.h>
 #include <stdlib.h>
