@@ -11,7 +11,7 @@
 
 /* ===   Tuning parameters   === */
 #ifndef ZWRAP_USE_ZSTD
-    #define ZWRAP_USE_ZSTD 0
+    #define ZWRAP_USE_ZSTD 1
 #endif
 
 

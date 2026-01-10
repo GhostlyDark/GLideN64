@@ -97,14 +97,11 @@ if( GLIDEN64_BUILD_TYPE STREQUAL "Debug")
     FIND_PACKAGE( ZLIB REQUIRED )
     FIND_PACKAGE( PNG REQUIRED )
     FIND_PACKAGE( ZSTD )
-
     if(${ZSTD_FOUND})
-      add_definitions( -DZWRAP_USE_ZSTD=1 )
       SET( ZSTD_PACKAGE "zstd::libzstd_static" )
     else(${ZSTD_FOUND})
       SET( ZSTD_PACKAGE "" )
     endif(${ZSTD_FOUND})
-
     target_link_libraries(GLideNHQd
       ${PNG_LIBRARIES}
       ${ZLIB_LIBRARIES}
@@ -112,14 +109,11 @@ if( GLIDEN64_BUILD_TYPE STREQUAL "Debug")
       osald
     )
   elseif(ANDROID)
-
       if(EXISTS "${ANDROID_LIB_PATH}/libs/${BUILD_VARIANT}/${ANDROID_ABI}/libzstd.a")
-        add_definitions( -DZWRAP_USE_ZSTD=1 )
         SET( ZSTD_PACKAGE "${ANDROID_LIB_PATH}/libs/${BUILD_VARIANT}/${ANDROID_ABI}/libzstd.a" )
       else()
         SET( ZSTD_PACKAGE "" )
       endif()
-
       target_link_libraries(GLideNHQ PRIVATE
               ${ANDROID_LIB_PATH}/libs/${BUILD_VARIANT}/${ANDROID_ABI}/libpng.a
               ${ZSTD_PACKAGE}
@@ -128,18 +122,10 @@ if( GLIDEN64_BUILD_TYPE STREQUAL "Debug")
               osal
               )
   else(MINGW OR BCMHOST OR APPLE OR USE_SYSTEM_LIBS)
-
-	if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/lib/libzstd.a")
-      add_definitions( -DZWRAP_USE_ZSTD=1 )
-      SET( ZSTD_PACKAGE "${CMAKE_CURRENT_SOURCE_DIR}/lib/libzstd.a" )
-	else()
-      SET( ZSTD_PACKAGE "" )
-	endif()
-
     target_link_libraries(GLideNHQd PRIVATE
       ${CMAKE_CURRENT_SOURCE_DIR}/lib/libpng.a
       ${CMAKE_CURRENT_SOURCE_DIR}/lib/libz.a
-      ${ZSTD_PACKAGE}
+      ${CMAKE_CURRENT_SOURCE_DIR}/lib/libzstd.a
       dl
       osald
     )
@@ -153,14 +139,11 @@ else( GLIDEN64_BUILD_TYPE STREQUAL "Debug")
 #  find_library(PNGLIB libpng.a)
 
   if(PANDORA)
-
 	if(EXISTS "/mnt/utmp/codeblocks/usr/lib/libzstd.a")
-      add_definitions( -DZWRAP_USE_ZSTD=1 )
       SET( ZSTD_PACKAGE "/mnt/utmp/codeblocks/usr/lib/libzstd.a" )
 	else()
       SET( ZSTD_PACKAGE "" )
 	endif()
-
     target_link_libraries(GLideNHQ PRIVATE
       /mnt/utmp/codeblocks/usr/lib/libpng.a
       /mnt/utmp/codeblocks/usr/lib/libz.a
@@ -171,14 +154,11 @@ else( GLIDEN64_BUILD_TYPE STREQUAL "Debug")
     FIND_PACKAGE( ZLIB REQUIRED )
     FIND_PACKAGE( PNG REQUIRED )
     FIND_PACKAGE( ZSTD )
-
     if(${ZSTD_FOUND})
-      add_definitions( -DZWRAP_USE_ZSTD=1 )
       SET( ZSTD_PACKAGE "zstd::libzstd_static" )
     else(${ZSTD_FOUND})
       SET( ZSTD_PACKAGE "" )
     endif(${ZSTD_FOUND})
-
     target_link_libraries(GLideNHQ
       ${PNG_LIBRARIES}
       ${ZLIB_LIBRARIES}
@@ -186,14 +166,11 @@ else( GLIDEN64_BUILD_TYPE STREQUAL "Debug")
       osal
     )
   elseif(ANDROID)
-
 	if(EXISTS "${ANDROID_LIB_PATH}/libs/${BUILD_VARIANT}/${ANDROID_ABI}/libzstd.a")
-      add_definitions( -DZWRAP_USE_ZSTD=1 )
       SET( ZSTD_PACKAGE "${ANDROID_LIB_PATH}/libs/${BUILD_VARIANT}/${ANDROID_ABI}/libzstd.a" )
 	else()
       SET( ZSTD_PACKAGE "" )
 	endif()
-
     target_link_libraries(GLideNHQ PRIVATE
       ${ANDROID_LIB_PATH}/libs/${BUILD_VARIANT}/${ANDROID_ABI}/libpng.a
       ${ZSTD_PACKAGE}
@@ -202,18 +179,10 @@ else( GLIDEN64_BUILD_TYPE STREQUAL "Debug")
       osal
     )
   else(PANDORA)
-
-	if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/lib/libzstd.a")
-      add_definitions( -DZWRAP_USE_ZSTD=1 )
-      SET( ZSTD_PACKAGE "${CMAKE_CURRENT_SOURCE_DIR}/lib/libzstd.a" )
-	else()
-      SET( ZSTD_PACKAGE "" )
-	endif()
-
     target_link_libraries(GLideNHQ PRIVATE
       ${CMAKE_CURRENT_SOURCE_DIR}/lib/libpng.a
       ${CMAKE_CURRENT_SOURCE_DIR}/lib/libz.a
-      ${ZSTD_PACKAGE}
+      ${CMAKE_CURRENT_SOURCE_DIR}/lib/libzstd.a
       dl
       osal
     )
