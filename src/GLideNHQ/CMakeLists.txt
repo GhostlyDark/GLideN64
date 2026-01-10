@@ -96,27 +96,17 @@ if( GLIDEN64_BUILD_TYPE STREQUAL "Debug")
   if(MINGW OR BCMHOST OR APPLE OR USE_SYSTEM_LIBS)
     FIND_PACKAGE( ZLIB REQUIRED )
     FIND_PACKAGE( PNG REQUIRED )
-    FIND_PACKAGE( ZSTD )
-    if(${ZSTD_FOUND})
-      SET( ZSTD_PACKAGE "zstd::libzstd_static" )
-    else(${ZSTD_FOUND})
-      SET( ZSTD_PACKAGE "" )
-    endif(${ZSTD_FOUND})
+    FIND_PACKAGE( ZSTD REQUIRED )
     target_link_libraries(GLideNHQd
       ${PNG_LIBRARIES}
       ${ZLIB_LIBRARIES}
-      ${ZSTD_PACKAGE}
+      zstd::libzstd_static
       osald
     )
   elseif(ANDROID)
-      if(EXISTS "${ANDROID_LIB_PATH}/libs/${BUILD_VARIANT}/${ANDROID_ABI}/libzstd.a")
-        SET( ZSTD_PACKAGE "${ANDROID_LIB_PATH}/libs/${BUILD_VARIANT}/${ANDROID_ABI}/libzstd.a" )
-      else()
-        SET( ZSTD_PACKAGE "" )
-      endif()
       target_link_libraries(GLideNHQ PRIVATE
               ${ANDROID_LIB_PATH}/libs/${BUILD_VARIANT}/${ANDROID_ABI}/libpng.a
-              ${ZSTD_PACKAGE}
+              ${ANDROID_LIB_PATH}/libs/${BUILD_VARIANT}/${ANDROID_ABI}/libzstd.a
               z
               dl
               osal
@@ -139,41 +129,26 @@ else( GLIDEN64_BUILD_TYPE STREQUAL "Debug")
 #  find_library(PNGLIB libpng.a)
 
   if(PANDORA)
-	if(EXISTS "/mnt/utmp/codeblocks/usr/lib/libzstd.a")
-      SET( ZSTD_PACKAGE "/mnt/utmp/codeblocks/usr/lib/libzstd.a" )
-	else()
-      SET( ZSTD_PACKAGE "" )
-	endif()
     target_link_libraries(GLideNHQ PRIVATE
       /mnt/utmp/codeblocks/usr/lib/libpng.a
       /mnt/utmp/codeblocks/usr/lib/libz.a
-      ${ZSTD_PACKAGE}
+      /mnt/utmp/codeblocks/usr/lib/libzstd.a
       osal
     )
   elseif(BCMHOST OR MINGW OR APPLE OR USE_SYSTEM_LIBS)
     FIND_PACKAGE( ZLIB REQUIRED )
     FIND_PACKAGE( PNG REQUIRED )
-    FIND_PACKAGE( ZSTD )
-    if(${ZSTD_FOUND})
-      SET( ZSTD_PACKAGE "zstd::libzstd_static" )
-    else(${ZSTD_FOUND})
-      SET( ZSTD_PACKAGE "" )
-    endif(${ZSTD_FOUND})
+    FIND_PACKAGE( ZSTD REQUIRED )
     target_link_libraries(GLideNHQ
       ${PNG_LIBRARIES}
       ${ZLIB_LIBRARIES}
-      ${ZSTD_PACKAGE}
+      zstd::libzstd_static
       osal
     )
   elseif(ANDROID)
-	if(EXISTS "${ANDROID_LIB_PATH}/libs/${BUILD_VARIANT}/${ANDROID_ABI}/libzstd.a")
-      SET( ZSTD_PACKAGE "${ANDROID_LIB_PATH}/libs/${BUILD_VARIANT}/${ANDROID_ABI}/libzstd.a" )
-	else()
-      SET( ZSTD_PACKAGE "" )
-	endif()
     target_link_libraries(GLideNHQ PRIVATE
       ${ANDROID_LIB_PATH}/libs/${BUILD_VARIANT}/${ANDROID_ABI}/libpng.a
-      ${ZSTD_PACKAGE}
+      ${ANDROID_LIB_PATH}/libs/${BUILD_VARIANT}/${ANDROID_ABI}/libzstd.a
       z
       dl
       osal
