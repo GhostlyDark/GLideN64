@@ -176,7 +176,6 @@ bool TxMemoryCache::add(Checksum checksum, GHQTexInfo* info, int dataSize)
 
 		if (_options & (GZ_TEXCACHE | GZ_HIRESTEXCACHE)) {
 			/* zlib compress it. compression level:1 (best speed) */
-
 			uLongf destLen = _gzdestLen;
 			dest = (dest == _gzdest0) ? _gzdest1 : _gzdest0;
 			if (compress2(dest, &destLen, info->data, dataSize, 9) != Z_OK) {
@@ -761,7 +760,6 @@ bool TxFileStorage::add(Checksum checksum, GHQTexInfo *info, int dataSize)
 
 		if (_options & (GZ_TEXCACHE | GZ_HIRESTEXCACHE)) {
 			/* zlib compress it. compression level:1 (best speed) */
-
 			uLongf destLen = _gzdestLen;
 			dest = (dest == _gzdest0) ? _gzdest1 : _gzdest0;
 			if (compress2(dest, &destLen, info->data, dataSize, 9) != Z_OK) {
