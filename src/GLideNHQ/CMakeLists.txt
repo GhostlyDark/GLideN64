@@ -23,11 +23,12 @@ set(GLideNHQ_SOURCES
 )
 
 list(APPEND GLideNHQ_SOURCES
+  zlibWrapper/zstd.c
+  zlibWrapper/zstd_zlibwrapper.c
   zlibWrapper/gzclose.c
   zlibWrapper/gzlib.c
   zlibWrapper/gzread.c
   zlibWrapper/gzwrite.c
-  zlibWrapper/zstd_zlibwrapper.c
 )
 
 if(MINGW OR PANDORA OR BCMHOST)
@@ -96,17 +97,14 @@ if( GLIDEN64_BUILD_TYPE STREQUAL "Debug")
   if(MINGW OR BCMHOST OR APPLE OR USE_SYSTEM_LIBS)
     FIND_PACKAGE( ZLIB REQUIRED )
     FIND_PACKAGE( PNG REQUIRED )
-    FIND_PACKAGE( ZSTD REQUIRED )
     target_link_libraries(GLideNHQd
       ${PNG_LIBRARIES}
       ${ZLIB_LIBRARIES}
-      zstd::libzstd_static
       osald
     )
   elseif(ANDROID)
       target_link_libraries(GLideNHQ PRIVATE
               ${ANDROID_LIB_PATH}/libs/${BUILD_VARIANT}/${ANDROID_ABI}/libpng.a
-              ${ANDROID_LIB_PATH}/libs/${BUILD_VARIANT}/${ANDROID_ABI}/libzstd.a
               z
               dl
               osal
@@ -115,7 +113,6 @@ if( GLIDEN64_BUILD_TYPE STREQUAL "Debug")
     target_link_libraries(GLideNHQd PRIVATE
       ${CMAKE_CURRENT_SOURCE_DIR}/lib/libpng.a
       ${CMAKE_CURRENT_SOURCE_DIR}/lib/libz.a
-      ${CMAKE_CURRENT_SOURCE_DIR}/lib/libzstd.a
       dl
       osald
     )
@@ -132,23 +129,19 @@ else( GLIDEN64_BUILD_TYPE STREQUAL "Debug")
     target_link_libraries(GLideNHQ PRIVATE
       /mnt/utmp/codeblocks/usr/lib/libpng.a
       /mnt/utmp/codeblocks/usr/lib/libz.a
-      /mnt/utmp/codeblocks/usr/lib/libzstd.a
       osal
     )
   elseif(BCMHOST OR MINGW OR APPLE OR USE_SYSTEM_LIBS)
     FIND_PACKAGE( ZLIB REQUIRED )
     FIND_PACKAGE( PNG REQUIRED )
-    FIND_PACKAGE( ZSTD REQUIRED )
     target_link_libraries(GLideNHQ
       ${PNG_LIBRARIES}
       ${ZLIB_LIBRARIES}
-      zstd::libzstd_static
       osal
     )
   elseif(ANDROID)
     target_link_libraries(GLideNHQ PRIVATE
       ${ANDROID_LIB_PATH}/libs/${BUILD_VARIANT}/${ANDROID_ABI}/libpng.a
-      ${ANDROID_LIB_PATH}/libs/${BUILD_VARIANT}/${ANDROID_ABI}/libzstd.a
       z
       dl
       osal
@@ -157,7 +150,6 @@ else( GLIDEN64_BUILD_TYPE STREQUAL "Debug")
     target_link_libraries(GLideNHQ PRIVATE
       ${CMAKE_CURRENT_SOURCE_DIR}/lib/libpng.a
       ${CMAKE_CURRENT_SOURCE_DIR}/lib/libz.a
-      ${CMAKE_CURRENT_SOURCE_DIR}/lib/libzstd.a
       dl
       osal
     )

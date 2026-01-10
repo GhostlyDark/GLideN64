@@ -52,6 +52,12 @@
     <ClCompile Include="..\..\src\GLideNHQ\TextureFilters.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\GLideNHQ\zlibWrapper\zstd.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\GLideNHQ\zlibWrapper\zstd_zlibwrapper.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\src\GLideNHQ\zlibWrapper\gzclose.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -62,9 +68,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\GLideNHQ\zlibWrapper\gzwrite.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\GLideNHQ\zlibWrapper\zstd_zlibwrapper.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
