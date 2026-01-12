@@ -33,8 +33,6 @@
 #include <osal_files.h>
 #include <osal_keys.h>
 
-#include "zlibWrapper/zstd_zlibwrapper.h"
-
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>

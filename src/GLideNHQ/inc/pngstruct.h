@@ -28,7 +28,7 @@
 #  define ZLIB_CONST
 #endif
 
-#include "zlibWrapper/zstd_zlibwrapper.h"
+#include "zlib.h"
 
 #ifdef const
    /* zlib.h sometimes #defines const to nothing, undo this. */

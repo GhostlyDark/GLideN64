@@ -23,12 +23,12 @@ set(GLideNHQ_SOURCES
 )
 
 list(APPEND GLideNHQ_SOURCES
-  zlibWrapper/zstd.c
-  zlibWrapper/zstd_zlibwrapper.c
-  zlibWrapper/gzclose.c
-  zlibWrapper/gzlib.c
-  zlibWrapper/gzread.c
-  zlibWrapper/gzwrite.c
+  zstd/zstd.c
+  zstd/zstd_zlibwrapper.c
+  zstd/gzclose.c
+  zstd/gzlib.c
+  zstd/gzread.c
+  zstd/gzwrite.c
 )
 
 if(MINGW OR PANDORA OR BCMHOST)

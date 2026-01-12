@@ -52,22 +52,22 @@
     <ClCompile Include="..\..\src\GLideNHQ\TextureFilters.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\GLideNHQ\zlibWrapper\zstd.c">
+    <ClCompile Include="..\..\src\GLideNHQ\zstd\zstd.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\GLideNHQ\zlibWrapper\zstd_zlibwrapper.c">
+    <ClCompile Include="..\..\src\GLideNHQ\zstd\zstd_zlibwrapper.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\GLideNHQ\zlibWrapper\gzclose.c">
+    <ClCompile Include="..\..\src\GLideNHQ\zstd\gzclose.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\GLideNHQ\zlibWrapper\gzclose.c">
+    <ClCompile Include="..\..\src\GLideNHQ\zstd\gzclose.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\GLideNHQ\zlibWrapper\gzread.c">
+    <ClCompile Include="..\..\src\GLideNHQ\zstd\gzread.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\GLideNHQ\zlibWrapper\gzwrite.c">
+    <ClCompile Include="..\..\src\GLideNHQ\zstd\gzwrite.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

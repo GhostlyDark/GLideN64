@@ -27,8 +27,7 @@
 
 #include <fstream>
 #include <unordered_map>
-
-#include "zlibWrapper/zstd_zlibwrapper.h"
+#include "zstd/zstd_zlibwrapper.h"
 
 #include <memory.h>
 #include <stdlib.h>

@@ -29,8 +29,6 @@
 #include "TxDbg.h"
 #include <osal_files.h>
 
-#include "zlibWrapper/zstd_zlibwrapper.h"
-
 #define TEXCACHE_DUMP_ENABLED (FILE_TEXCACHE|DUMP_TEXCACHE)
 
 TxTexCache::~TxTexCache()
