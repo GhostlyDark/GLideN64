@@ -61,7 +61,7 @@
     <ClCompile Include="..\..\src\GLideNHQ\zstd\gzclose.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\GLideNHQ\zstd\gzclose.c">
+    <ClCompile Include="..\..\src\GLideNHQ\zstd\gzlib.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\GLideNHQ\zstd\gzread.c">

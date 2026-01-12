@@ -27,6 +27,8 @@
 
 #include <fstream>
 #include <unordered_map>
+
+#define ZWRAP_USE_ZSTD 1 // enable ZSTD compression for zlibWrapper
 #include "zstd/zstd_zlibwrapper.h"
 
 #include <memory.h>

@@ -183,12 +183,28 @@ local gzFile gz_open(const void *path, int fd, const char *mode) {
     }
 
     /* save the path name for error messages */
+#ifdef WIDECHAR
+    if (fd == -2) {
+        len = wcstombs(NULL, path, 0);
+        if (len == (z_size_t)-1)
+            len = 0;
+    }
+    else
+#endif
         len = strlen((const char *)path);
     state.state->path = (char *)malloc(len + 1);
     if (state.state->path == NULL) {
         free(state.state);
         return NULL;
     }
+#ifdef WIDECHAR
+    if (fd == -2)
+        if (len)
+            wcstombs(state.state->path, path, len + 1);
+        else
+            *(state.state->path) = 0;
+    else
+#endif
 #if !defined(NO_snprintf) && !defined(NO_vsnprintf)
         (void)snprintf(state.state->path, len + 1, "%s", (const char *)path);
 #else
@@ -218,6 +234,9 @@ local gzFile gz_open(const void *path, int fd, const char *mode) {
 
     /* open the file with the appropriate flags (or just use fd) */
     state.state->fd = fd > -1 ? fd : (
+#ifdef WIDECHAR
+        fd == -2 ? _wopen(path, oflag, 0666) :
+#endif
         open((const char *)path, oflag, 0666));
     if (state.state->fd == -1) {
         free(state.state->path);

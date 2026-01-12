@@ -11,7 +11,7 @@
 
 /* ===   Tuning parameters   === */
 #ifndef ZWRAP_USE_ZSTD
-    #define ZWRAP_USE_ZSTD 1
+    #define ZWRAP_USE_ZSTD 0
 #endif
 
 
@@ -427,7 +427,7 @@ ZEXTERN int ZEXPORT z_deflate _Z_OF((z_streamp strm, int flush))
         || flush == Z_TREES
 #endif
         || flush == Z_BLOCK)
-        return 0;
+        return ZWRAPC_finishWithErrorMsg(strm, "Z_FULL_FLUSH, Z_BLOCK and Z_TREES are not supported!");
 
     if (flush == Z_FINISH) {
         size_t bytesLeft;
@@ -962,7 +962,7 @@ ZEXTERN int ZEXPORT z_deflateCopy _Z_OF((z_streamp dest,
 {
     if (!g_ZWRAP_useZSTDcompression)
         return deflateCopy(dest, source);
-    return 0;
+    return ZWRAPC_finishWithErrorMsg(source, "deflateCopy is not supported!");
 }
 
 
@@ -974,7 +974,7 @@ ZEXTERN int ZEXPORT z_deflateTune _Z_OF((z_streamp strm,
 {
     if (!g_ZWRAP_useZSTDcompression)
         return deflateTune(strm, good_length, max_lazy, nice_length, max_chain);
-    return 0;
+    return ZWRAPC_finishWithErrorMsg(strm, "deflateTune is not supported!");
 }
 
 
@@ -985,7 +985,7 @@ ZEXTERN int ZEXPORT z_deflatePending _Z_OF((z_streamp strm,
 {
     if (!g_ZWRAP_useZSTDcompression)
         return deflatePending(strm, pending, bits);
-    return 0;
+    return ZWRAPC_finishWithErrorMsg(strm, "deflatePending is not supported!");
 }
 #endif
 
@@ -996,7 +996,7 @@ ZEXTERN int ZEXPORT z_deflatePrime _Z_OF((z_streamp strm,
 {
     if (!g_ZWRAP_useZSTDcompression)
         return deflatePrime(strm, bits, value);
-    return 0;
+    return ZWRAPC_finishWithErrorMsg(strm, "deflatePrime is not supported!");
 }
 
 
@@ -1005,7 +1005,7 @@ ZEXTERN int ZEXPORT z_deflateSetHeader _Z_OF((z_streamp strm,
 {
     if (!g_ZWRAP_useZSTDcompression)
         return deflateSetHeader(strm, head);
-    return 0;
+    return ZWRAPC_finishWithErrorMsg(strm, "deflateSetHeader is not supported!");
 }
 
 
@@ -1019,7 +1019,7 @@ ZEXTERN int ZEXPORT z_inflateGetDictionary _Z_OF((z_streamp strm,
 {
     if (g_ZWRAPdecompressionType == ZWRAP_FORCE_ZLIB || !strm->reserved)
         return inflateGetDictionary(strm, dictionary, dictLength);
-    return 0;
+    return ZWRAPD_finishWithErrorMsg(strm, "inflateGetDictionary is not supported!");
 }
 #endif
 
@@ -1029,7 +1029,7 @@ ZEXTERN int ZEXPORT z_inflateCopy _Z_OF((z_streamp dest,
 {
     if (g_ZWRAPdecompressionType == ZWRAP_FORCE_ZLIB || !source->reserved)
         return inflateCopy(dest, source);
-    return 0;
+    return ZWRAPD_finishWithErrorMsg(source, "inflateCopy is not supported!");
 }
 
 
@@ -1038,7 +1038,7 @@ ZEXTERN long ZEXPORT z_inflateMark _Z_OF((z_streamp strm))
 {
     if (g_ZWRAPdecompressionType == ZWRAP_FORCE_ZLIB || !strm->reserved)
         return inflateMark(strm);
-    return 0;
+    return ZWRAPD_finishWithErrorMsg(strm, "inflateMark is not supported!");
 }
 #endif
 
@@ -1049,7 +1049,7 @@ ZEXTERN int ZEXPORT z_inflatePrime _Z_OF((z_streamp strm,
 {
     if (g_ZWRAPdecompressionType == ZWRAP_FORCE_ZLIB || !strm->reserved)
         return inflatePrime(strm, bits, value);
-    return 0;
+    return ZWRAPD_finishWithErrorMsg(strm, "inflatePrime is not supported!");
 }
 
 
@@ -1058,7 +1058,7 @@ ZEXTERN int ZEXPORT z_inflateGetHeader _Z_OF((z_streamp strm,
 {
     if (g_ZWRAPdecompressionType == ZWRAP_FORCE_ZLIB || !strm->reserved)
         return inflateGetHeader(strm, head);
-    return 0;
+    return ZWRAPD_finishWithErrorMsg(strm, "inflateGetHeader is not supported!");
 }
 
 
@@ -1069,7 +1069,7 @@ ZEXTERN int ZEXPORT z_inflateBackInit_ _Z_OF((z_streamp strm, int windowBits,
 {
     if (g_ZWRAPdecompressionType == ZWRAP_FORCE_ZLIB || !strm->reserved)
         return inflateBackInit_(strm, windowBits, window, version, stream_size);
-    return 0;
+    return ZWRAPD_finishWithErrorMsg(strm, "inflateBackInit is not supported!");
 }
 
 
@@ -1079,7 +1079,7 @@ ZEXTERN int ZEXPORT z_inflateBack _Z_OF((z_streamp strm,
 {
     if (g_ZWRAPdecompressionType == ZWRAP_FORCE_ZLIB || !strm->reserved)
         return inflateBack(strm, in, in_desc, out, out_desc);
-    return 0;
+    return ZWRAPD_finishWithErrorMsg(strm, "inflateBack is not supported!");
 }
 
 
@@ -1087,7 +1087,7 @@ ZEXTERN int ZEXPORT z_inflateBackEnd _Z_OF((z_streamp strm))
 {
     if (g_ZWRAPdecompressionType == ZWRAP_FORCE_ZLIB || !strm->reserved)
         return inflateBackEnd(strm);
-    return 0;
+    return ZWRAPD_finishWithErrorMsg(strm, "inflateBackEnd is not supported!");
 }
 
 
