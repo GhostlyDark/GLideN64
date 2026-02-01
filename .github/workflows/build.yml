@@ -84,6 +84,12 @@ jobs:
             mingw-w64-x86_64-libpng
             mingw-w64-x86_64-qt5
             mingw-w64-x86_64-zlib
+      - name: Setup vcpkg
+        uses: lukka/run-vcpkg@v11
+        id: runvcpkg
+        with:
+          vcpkgConfigurationJsonGlob: projects/msvc/vcpkg-configuration.json
+          vcpkgJsonGlob: projects/msvc/vcpkg.json
       - name: Prepare Environment
         run: |
           $env:revision = git rev-parse --short HEAD
@@ -95,6 +101,10 @@ jobs:
           echo "Mupen64PluginsDir_x64=$pwd\build\windows-mupen64plus-cli-x64\" >> $env:GITHUB_ENV
           echo "GIT_REVISION=$env:revision" >> $env:GITHUB_ENV
         shell: pwsh
+      - name: Prepare vcpkg
+        run: |
+          vcpkg integrate install
+        shell: cmd
       - name: Prepare Qt x64 Builds
         if: ${{ matrix.image == 'GLideN64 (x64 Project64-Qt)' || matrix.image == 'GLideN64 (x64 PJ64Legacy-Qt)' }}
         run: |
